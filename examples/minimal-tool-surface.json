@@ -1,0 +1,71 @@
+{
+  "name": "minimal checkout incident surface",
+  "servers": [
+    {
+      "id": "logs",
+      "title": "Logs",
+      "category": "runtime logs",
+      "description": "Read-only service log search.",
+      "tools": [
+        {
+          "id": "logs.search",
+          "name": "searchLogs",
+          "description": "Search service logs by trace id, severity, service, and time window.",
+          "permissionLevel": "read",
+          "riskLevel": "medium",
+          "tags": ["logs", "search"],
+          "duplicateGroup": "incident-search"
+        },
+        {
+          "id": "logs.exportAll",
+          "name": "exportAllLogs",
+          "description": "Export every log stream for every service and environment.",
+          "permissionLevel": "read",
+          "riskLevel": "medium",
+          "tags": ["logs", "bulk"],
+          "noisy": true
+        }
+      ]
+    },
+    {
+      "id": "repo",
+      "title": "Repository",
+      "category": "source repository",
+      "description": "Repository code search and patch preparation.",
+      "tools": [
+        {
+          "id": "repo.search",
+          "name": "searchCode",
+          "description": "Search code, tests, owners, and configuration by literal text.",
+          "permissionLevel": "read",
+          "riskLevel": "low",
+          "tags": ["repo", "search"],
+          "duplicateGroup": "incident-search"
+        },
+        {
+          "id": "repo.delete",
+          "name": "deleteRepository",
+          "description": "Delete repository history, issues, pull requests, branch rules, and settings.",
+          "permissionLevel": "admin",
+          "riskLevel": "high",
+          "tags": ["repo", "destructive"]
+        }
+      ]
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "investigate-checkout-incident",
+      "title": "Investigate Checkout Incident",
+      "description": "Collect logs and source context for a checkout incident without exposing destructive actions.",
+      "intent": "Find the likely failing path and gather evidence for a narrow fix.",
+      "whenToUse": "Use when an agent needs to inspect a checkout production symptom.",
+      "requiredContext": ["service name", "time window", "trace id or symptom"],
+      "permissionLevel": "read",
+      "riskLevel": "medium",
+      "underlyingTools": ["logs.search", "repo.search"],
+      "proofReturned": ["log query", "matching files", "evidence summary"],
+      "examples": ["Investigate checkout 500s in the last 30 minutes."]
+    }
+  ]
+}

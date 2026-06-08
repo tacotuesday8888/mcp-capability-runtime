@@ -12,9 +12,10 @@ The current repository name, `mcp-capability-runtime`, is temporary. The final n
 npm install
 npm test
 npm run demo:tax
+npm run example:tax
 ```
 
-The demo is local and deterministic. It does not need SaaS accounts, API keys, real credentials, a live LLM, or real MCP transports.
+The demo and external JSON example are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, or real MCP transports.
 
 ## What The Demo Shows
 
@@ -69,6 +70,19 @@ Duplicate groups
 
 The token estimate is a documented heuristic, not a model tokenizer. It is meant to make the tool-list tax visible and repeatable.
 
+## External JSON Input
+
+You can run the tax meter against a static, read-only MCP-like tool surface:
+
+```bash
+npm run build
+node dist/src/cli.js tax --input examples/minimal-tool-surface.json
+```
+
+The input file contains raw MCP-like servers plus a proposed cleaned capability surface. The loader validates the file before running the tax meter and reports malformed fields with paths like `servers[0].tools[0].permissionLevel`.
+
+See [docs/external-input.md](docs/external-input.md) for the format and how this evolves toward real MCP server discovery.
+
 ## Framework API
 
 ```ts
@@ -92,12 +106,13 @@ Public exports include:
 - prompt token estimation
 - tax-meter calculation
 - text report rendering
+- external JSON input parsing and validation
 
 ## Compatibility Path
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. Future versions can add a real MCP adapter/router that reads existing MCP servers and presents a capability surface to agents.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 adds a static JSON input path so developers can measure non-demo tool surfaces without editing source code. Future versions can add a real MCP adapter/router that reads existing MCP servers and presents a capability surface to agents.
 
 ## V1 Scope
 
@@ -111,6 +126,8 @@ This first slice includes:
 - CLI demo
 - README and docs
 - tests
+- GitHub Actions CI
+- static external JSON input
 
 ## Out Of Scope For V1
 
@@ -124,6 +141,10 @@ This repo intentionally does not yet include:
 - full incident-to-PR runner
 - final protocol specification
 - final brand or name
+
+## Roadmap
+
+See [docs/roadmap.md](docs/roadmap.md) for the next milestones: real MCP adapter, capability router, receipts/proof, incident-to-PR runner, and naming research.
 
 ## Long-Term Direction
 
