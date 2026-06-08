@@ -1,0 +1,24 @@
+MCP Capability Runtime Tax Meter
+================================
+
+Raw MCP-like surface      40 tools (~1734 prompt tokens)
+Capability surface        8 capabilities (~808 prompt tokens)
+
+Tool count reduction      80%
+Token estimate reduction  53%
+Risky exposure reduction  89%
+
+Risky raw tools           9
+Risky capabilities        1
+Noisy raw tools           8
+Duplicate raw tools       12
+
+Duplicate groups
+- incident-evidence-search: chat.searchIncidentChannel, deploy.searchLogs, error.searchEvents
+- release-state: deploy.getStatus, package.lookup, pr.getStatus
+- runtime-state-query: db.runReadOnlyQuery, package.auditPackage
+- source-evidence-search: docs.searchPages, repo.searchCode
+- work-item-search: issue.searchIssues, pr.searchPullRequests
+
+Heuristic: token estimates count word-like chunks in tool and capability metadata, multiply by 1.15,
+and add a small structural cost for arrays. This is a deterministic prompt-budget proxy, not a tokenizer.

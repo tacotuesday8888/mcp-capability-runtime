@@ -1,0 +1,47 @@
+{
+  "name": "mcp-capability-runtime",
+  "version": "0.1.0",
+  "description": "A MCP-compatible capability runtime demo that turns flat tool lists into capability surfaces.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "bin": {
+    "mcp-capability-runtime": "./dist/src/cli.js"
+  },
+  "files": [
+    "dist/src",
+    "README.md",
+    "docs",
+    "examples",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test \"dist/tests/**/*.test.js\"",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "demo:tax": "npm run build && node dist/src/cli.js demo:tax"
+  },
+  "keywords": [
+    "mcp",
+    "capabilities",
+    "agents",
+    "tooling",
+    "runtime"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "typescript": "latest"
+  }
+}
