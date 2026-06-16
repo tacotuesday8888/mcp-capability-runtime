@@ -1,6 +1,6 @@
 {
   "name": "mcp-capability-runtime",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "A MCP-compatible capability runtime demo that turns flat tool lists into capability surfaces.",
   "type": "module",
   "license": "MIT",
@@ -44,6 +44,8 @@
     "demo:walkthrough": "npm run build && node dist/src/cli.js demo:walkthrough",
     "demo:receipt": "npm run build && node dist/src/cli.js demo:receipt",
     "demo:receipt:json": "npm run build && node dist/src/cli.js demo:receipt --json",
+    "demo:discover": "npm run build && node dist/src/cli.js discover --config examples/mcp-discovery-config.json",
+    "demo:discover:json": "npm run build && node dist/src/cli.js discover --config examples/mcp-discovery-config.json --json",
     "prepack": "npm run build",
     "pack:check": "npm --cache ./.npm-cache pack --dry-run --json"
   },

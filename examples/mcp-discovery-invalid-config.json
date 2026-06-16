@@ -1,0 +1,36 @@
+{
+  "servers": [
+    {
+      "id": "local-logs",
+      "title": "Local Logs MCP",
+      "category": "error tracking and logs",
+      "description": "Invalid transcript with duplicate discovered tool names.",
+      "toolsList": [
+        {
+          "tools": [
+            {
+              "name": "search_events",
+              "description": "Search recent checkout error events.",
+              "inputSchema": {
+                "type": "object"
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            },
+            {
+              "name": "search_events",
+              "description": "Duplicate search tool.",
+              "inputSchema": {
+                "type": "object"
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

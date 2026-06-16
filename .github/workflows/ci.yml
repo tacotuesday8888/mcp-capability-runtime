@@ -66,5 +66,11 @@ jobs:
       - name: Demo local receipt JSON
         run: npm run demo:receipt:json
 
+      - name: Demo MCP discovery
+        run: npm run demo:discover
+
+      - name: Demo MCP discovery JSON
+        run: npm run demo:discover:json
+
       - name: Package dry-run
         run: npm run pack:check

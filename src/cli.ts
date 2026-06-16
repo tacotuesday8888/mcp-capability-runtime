@@ -9,9 +9,12 @@ import {
   isRiskLevel,
   loadToolSurfaceFile,
   createDemoInvocationReceipt,
+  discoverMcpToolSurface,
+  loadMcpDiscoveryConfigFile,
   renderCapabilitySelectionReport,
   renderDemoReceiptReport,
   renderDemoWalkthroughReport,
+  renderMcpDiscoveryReport,
   renderTaxMeterReport,
   selectCapabilities,
 } from "./index.js";
@@ -24,6 +27,7 @@ function printHelp(): void {
       "Commands:",
       "  tax        Run the tax meter. Defaults to the built-in demo fixture.",
       "  select     Select a task-scoped capability surface and print a dry-run selection report.",
+      "  discover   Normalize a caller-supplied local MCP tools/list transcript without calling tools.",
       "  demo:walkthrough",
       "             Show the staged local demo from raw tools to planned capability routes.",
       "  demo:receipt",
@@ -44,6 +48,10 @@ function printHelp(): void {
       "",
       "Receipt options:",
       "  --json                     Print a stable JSON local receipt.",
+      "",
+      "Discover options:",
+      "  --config <file>            Read a caller-supplied local MCP discovery transcript.",
+      "  --json                     Print raw-only surface JSON for tax --input.",
       "  -h, --help       Show this help.",
     ].join("\n"),
   );
@@ -55,6 +63,7 @@ type CliOptions =
   | ({ command: "tax" } & SurfaceOptions)
   | { command: "demo:walkthrough" }
   | { command: "demo:receipt"; json: boolean }
+  | { command: "discover"; configFile: string; json: boolean }
   | ({
       command: "select";
       task: string;
@@ -92,6 +101,10 @@ function parseArgs(argv: string[]): CliOptions | "help" {
     return parseDemoReceiptArgs(rest);
   }
 
+  if (command === "discover") {
+    return parseDiscoverArgs(rest);
+  }
+
   if (command === "select") {
     return parseSelectArgs(rest);
   }
@@ -116,6 +129,34 @@ function parseDemoReceiptArgs(rest: string[]): CliOptions {
   }
 
   return { command: "demo:receipt", json };
+}
+
+function parseDiscoverArgs(rest: string[]): CliOptions {
+  let configFile: string | undefined;
+  let json = false;
+
+  for (let index = 0; index < rest.length; index += 1) {
+    const arg = rest[index];
+
+    if (arg === "--config") {
+      configFile = readOptionValue(rest, index, "--config");
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--json") {
+      json = true;
+      continue;
+    }
+
+    throw new ToolSurfaceValidationError([`unknown option for discover: ${arg ?? ""}`]);
+  }
+
+  if (configFile === undefined) {
+    throw new ToolSurfaceValidationError(["discover requires --config <file>"]);
+  }
+
+  return { command: "discover", configFile, json };
 }
 
 function parseSurfaceArgs(rest: string[]): SurfaceOptions {
@@ -290,6 +331,20 @@ function run(argv: string[]): number {
 
     if (options.command === "demo:receipt") {
       console.log(options.json ? JSON.stringify(createDemoInvocationReceipt(), null, 2) : renderDemoReceiptReport());
+      return 0;
+    }
+
+    if (options.command === "discover") {
+      const report = discoverMcpToolSurface(loadMcpDiscoveryConfigFile(options.configFile));
+
+      if (options.json && report.issues.length > 0) {
+        throw new ToolSurfaceValidationError([
+          "discovery produced issues; fix them before emitting tax-ready surface JSON",
+          ...report.issues.map((issue) => `${issue.code} at ${issue.path}: ${issue.message}`),
+        ]);
+      }
+
+      console.log(options.json ? JSON.stringify(report.surface, null, 2) : renderMcpDiscoveryReport(report));
       return 0;
     }
 

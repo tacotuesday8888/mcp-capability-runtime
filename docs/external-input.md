@@ -2,7 +2,7 @@
 
 The external input path lets users run the tax meter on a static, read-only MCP-like tool surface without editing source code.
 
-This does not discover, authenticate to, or execute real MCP servers. It only reads a local JSON file, validates it, normalizes server metadata onto each tool, audits any provided capability surface, and runs the same tax-meter calculation used by the built-in demo.
+This does not authenticate to or execute real MCP servers. It only reads a local JSON file, validates it, normalizes server metadata onto each tool, audits any provided capability surface, and runs the same tax-meter calculation used by the built-in demo.
 
 ## Run It
 
@@ -101,6 +101,8 @@ This keeps the cleaned surface honest. A capability can simplify the agent-facin
 
 ## Path To Real MCP Discovery
 
-This file format is the bridge between the local fixture and real MCP discovery.
+This file format is the bridge between the local fixture, offline MCP discovery transcripts, and future live MCP discovery.
 
-The adapter target is a read-only discovery shape: inspect configured MCP server metadata, write this same raw tool-surface JSON, and run the tax meter or selector without executing tools or handling real OAuth. Later, the runtime can replace static files with live discovery and capability routing while preserving the same core questions: what the agent should see, when it should see it, what it may do, what context it needs, and what proof it returns.
+v0.8 adds [MCP discovery](./mcp-discovery.md) for caller-supplied local saved `tools/list` transcript pages. It writes this same raw-only tool-surface JSON shape, so `tax --input` works unchanged.
+
+Live transport discovery remains future work. The target stays read-only: inspect configured MCP server metadata, write this same raw tool-surface JSON, and run the tax meter or selector without executing tools or handling real OAuth. Later, the runtime can replace static files with live discovery and capability routing while preserving the same core questions: what the agent should see, when it should see it, what it may do, what context it needs, and what proof it returns.

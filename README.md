@@ -16,6 +16,8 @@ npm test
 npm run demo:walkthrough
 npm run demo:receipt
 npm run demo:receipt:json
+npm run demo:discover
+npm run demo:discover:json
 npm run demo:tax
 npm run demo:select
 npm run example:tax
@@ -24,7 +26,7 @@ npm run raw:tax
 npm run pack:check
 ```
 
-The walkthrough, selector, receipt demo, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real production tool execution.
+The walkthrough, selector, receipt demo, discovery transcript demo, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real production tool execution.
 
 ## What The Demo Shows
 
@@ -191,6 +193,21 @@ const receipt = recordCapabilityInvocation({
 
 See [docs/invocation-receipts.md](docs/invocation-receipts.md) for the receipt contract and failure behavior.
 
+## Read-Only MCP Discovery
+
+The discovery demo normalizes a caller-supplied local MCP `tools/list` transcript into the same raw-only tool surface used by `tax --input`.
+
+```bash
+npm run demo:discover
+npm run demo:discover:json
+```
+
+`demo:discover:json` prints raw surface JSON, so it can be saved and measured by the tax meter. This is still offline and deterministic: no MCP server process is started, no network transport is opened, and no `tools/call` request happens.
+
+The normalizer treats MCP annotations as hints, not proof. For example, `readOnlyHint` can suggest a read permission label, while `destructiveHint` raises the normalized tool to admin/high risk. Missing annotations default to admin/high so untrusted tools are counted as risky.
+
+See [docs/mcp-discovery.md](docs/mcp-discovery.md) for the config shape, annotation policy, and boundary.
+
 ## External JSON Input
 
 You can run the tax meter against a static, read-only MCP-like tool surface with a proposed capability surface:
@@ -218,8 +235,10 @@ See [docs/external-input.md](docs/external-input.md) for the format and how this
 import {
   createDemoInvocationReceipt,
   computeTaxMeter,
+  discoverMcpToolSurface,
   demoCapabilities,
   demoServers,
+  loadMcpDiscoveryConfigFile,
   planCapabilityInvocation,
   renderTaxMeterReport,
   selectCapabilities,
@@ -242,6 +261,7 @@ const plan = planCapabilityInvocation({
 });
 console.log(plan.allowedToolRoutes);
 console.log(createDemoInvocationReceipt().proof);
+console.log(discoverMcpToolSurface(loadMcpDiscoveryConfigFile("examples/mcp-discovery-config.json")).surface.servers);
 ```
 
 Public exports include:
@@ -253,6 +273,7 @@ Public exports include:
 - task-scoped capability selection with separate surface and receipt outputs
 - capability invocation planning
 - local simulated invocation receipt recording
+- read-only MCP discovery transcript normalization
 - staged local walkthrough renderer
 - prompt token estimation
 - tax-meter calculation
@@ -263,7 +284,7 @@ Public exports include:
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. V0.6 adds a local invocation planner so selected capabilities can be converted into routeable tool plans without executing anything. V0.7 records local simulated invocation receipts from deterministic fixture results. Future versions can add read-only MCP discovery and then the fake incident-to-PR runner.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. V0.6 adds a local invocation planner so selected capabilities can be converted into routeable tool plans without executing anything. V0.7 records local simulated invocation receipts from deterministic fixture results. V0.8 normalizes caller-supplied local MCP `tools/list` transcripts into raw-only tool surfaces. Future versions can add live read-only MCP transport discovery and then the fake incident-to-PR runner.
 
 ## V1 Scope
 
@@ -286,6 +307,7 @@ This first slice includes:
 - separate selected surface and developer receipt outputs
 - capability invocation planner
 - local simulated invocation receipts
+- read-only MCP discovery transcript normalization
 - one-command staged demo walkthrough
 
 ## Out Of Scope For V1
@@ -303,7 +325,7 @@ This repo intentionally does not yet include:
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) for the next milestones: read-only MCP discovery, the incident-to-PR runner, and naming research.
+See [docs/roadmap.md](docs/roadmap.md) for the next milestones: live read-only MCP transport discovery, the incident-to-PR runner, and naming research.
 
 ## Long-Term Direction
 

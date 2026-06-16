@@ -5,12 +5,15 @@ import test from "node:test";
 import {
   createDemoInvocationReceipt,
   computeTaxMeter,
+  discoverMcpToolSurface,
   demoCapabilities,
   demoServers,
   loadToolSurfaceFile,
+  loadMcpDiscoveryConfigFile,
   renderCapabilitySelectionReport,
   renderDemoReceiptReport,
   renderDemoWalkthroughReport,
+  renderMcpDiscoveryReport,
   renderTaxMeterReport,
   selectCapabilities,
 } from "../src/index.js";
@@ -76,4 +79,13 @@ test("demo receipt JSON output matches the checked-in golden example", () => {
   const actual = JSON.stringify(createDemoInvocationReceipt(), null, 2);
 
   assert.equal(actual, expected);
+});
+
+test("MCP discovery output matches the checked-in golden examples", () => {
+  const report = discoverMcpToolSurface(loadMcpDiscoveryConfigFile("examples/mcp-discovery-config.json"));
+  const expectedText = readFileSync("examples/mcp-discovery-output.txt", "utf8").trimEnd();
+  const expectedJson = readFileSync("examples/mcp-discovery-output.json", "utf8").trimEnd();
+
+  assert.equal(renderMcpDiscoveryReport(report), expectedText);
+  assert.equal(JSON.stringify(report.surface, null, 2), expectedJson);
 });

@@ -12,6 +12,12 @@ export { renderCapabilitySelectionReport, selectCapabilities } from "./capabilit
 export { demoCapabilities, demoServers } from "./demo/fixture.js";
 export { createDemoInvocationReceipt, demoInvocationToolResults, renderDemoReceiptReport } from "./demo/receipt.js";
 export { renderDemoWalkthroughReport } from "./demo/walkthrough.js";
+export {
+  discoverMcpToolSurface,
+  loadMcpDiscoveryConfigFile,
+  parseMcpDiscoveryConfig,
+  renderMcpDiscoveryReport,
+} from "./discovery/mcp.js";
 export { loadToolSurfaceFile, parseToolSurfaceInput, ToolSurfaceValidationError } from "./input/json.js";
 export { planCapabilityInvocation } from "./runtime/plan.js";
 export { recordCapabilityInvocation } from "./runtime/receipt.js";
@@ -19,6 +25,17 @@ export { estimatePromptTokens } from "./tax-meter/estimate.js";
 export { computeTaxMeter, flattenTools } from "./tax-meter/tax-meter.js";
 export { renderTaxMeterReport } from "./tax-meter/report.js";
 export type { ToolSurfaceInput } from "./input/json.js";
+export type {
+  McpDiscoveredTool,
+  McpDiscoveryConfig,
+  McpDiscoveryIssue,
+  McpDiscoveryIssueCode,
+  McpDiscoveryMetadata,
+  McpDiscoveryReport,
+  McpDiscoveryServerConfig,
+  McpToolAnnotations,
+  McpToolsListPage,
+} from "./discovery/mcp.js";
 export type {
   Capability,
   CapabilityInvocationReceipt,

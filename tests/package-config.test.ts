@@ -41,6 +41,8 @@ test("package config builds before packing and checks publish contents", () => {
   assert.match(packageJson.scripts["demo:walkthrough"] ?? "", /demo:walkthrough/);
   assert.match(packageJson.scripts["demo:receipt"] ?? "", /demo:receipt/);
   assert.match(packageJson.scripts["demo:receipt:json"] ?? "", /demo:receipt --json/);
+  assert.match(packageJson.scripts["demo:discover"] ?? "", /discover --config examples\/mcp-discovery-config\.json/);
+  assert.match(packageJson.scripts["demo:discover:json"] ?? "", /discover --config examples\/mcp-discovery-config\.json --json/);
   assert.equal(packageJson.engines.node, ">=22");
   assert.equal(packageJson.repository?.url, "git+https://github.com/tacotuesday8888/mcp-capability-runtime.git");
   assert.equal(packageJson.bugs?.url, "https://github.com/tacotuesday8888/mcp-capability-runtime/issues");
@@ -85,9 +87,14 @@ test("package dry-run includes runtime planner and receipt artifacts", () => {
     "LICENSE",
     "docs/invocation-planner.md",
     "docs/invocation-receipts.md",
+    "docs/mcp-discovery.md",
+    "examples/mcp-discovery-config.json",
+    "examples/mcp-discovery-output.json",
+    "examples/mcp-discovery-output.txt",
     "examples/demo-receipt-output.json",
     "examples/demo-receipt-output.txt",
     "examples/demo-walkthrough-output.txt",
+    "dist/src/discovery/mcp.js",
     "dist/src/runtime/receipt.js",
     "dist/src/demo/receipt.js",
     "dist/src/runtime/plan.js",

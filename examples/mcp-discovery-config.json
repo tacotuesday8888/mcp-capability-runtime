@@ -1,0 +1,126 @@
+{
+  "name": "local MCP discovery transcript",
+  "servers": [
+    {
+      "id": "local-logs",
+      "title": "Local Logs MCP",
+      "category": "error tracking and logs",
+      "description": "Project-local transcript of read-only log discovery metadata.",
+      "toolsList": [
+        {
+          "tools": [
+            {
+              "name": "search_events",
+              "title": "Search Events",
+              "description": "Search recent checkout error events by service, release, trace id, and time window.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "service": {
+                    "type": "string"
+                  },
+                  "timeWindow": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "service",
+                  "timeWindow"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            }
+          ],
+          "nextCursor": "logs-page-2"
+        },
+        {
+          "cursor": "logs-page-2",
+          "tools": [
+            {
+              "name": "get_trace",
+              "title": "Get Trace",
+              "description": "Read one trace with stack frames, request metadata, environment, and release version.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "traceId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "traceId"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "local-repo",
+      "title": "Local Repo MCP",
+      "category": "source repository",
+      "description": "Project-local transcript of repository discovery metadata.",
+      "toolsList": [
+        {
+          "tools": [
+            {
+              "name": "search_code",
+              "title": "Search Code",
+              "description": "Search repository files, symbols, tests, config, and ownership hints.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              },
+              "outputSchema": {
+                "type": "object",
+                "properties": {
+                  "paths": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            },
+            {
+              "name": "delete_branch",
+              "title": "Delete Branch",
+              "description": "Delete a branch and remove its remote references.",
+              "inputSchema": {
+                "type": "object",
+                "properties": {
+                  "branch": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "branch"
+                ]
+              },
+              "annotations": {
+                "destructiveHint": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

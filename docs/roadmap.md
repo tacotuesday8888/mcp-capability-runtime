@@ -77,9 +77,12 @@ Still out of scope for v0.4:
 
 ## v0.8: Read-Only MCP Discovery
 
-- Inspect configured MCP servers without executing their tools.
-- Produce the same raw tool-surface shape used by the JSON path.
-- Keep authentication, OAuth, and production-grade transport hardening out of scope until the adapter contract is clear.
+- Normalize caller-supplied local saved MCP `tools/list` transcript pages without executing tools.
+- Produce the same raw-only tool-surface shape used by the JSON path.
+- Preserve discovered metadata for schemas and annotations in the developer-facing report.
+- Keep live server processes, network transports, authentication, OAuth, and production-grade transport hardening out of scope until the adapter contract is clear.
+
+Future live discovery can inspect configured MCP servers without calling `tools/call` once this transcript contract is stable.
 
 ## v0.9: Incident-To-PR Runner
 

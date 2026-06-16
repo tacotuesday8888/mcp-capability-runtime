@@ -1,0 +1,81 @@
+{
+  "name": "local MCP discovery transcript",
+  "servers": [
+    {
+      "id": "local-logs",
+      "title": "Local Logs MCP",
+      "category": "error tracking and logs",
+      "description": "Project-local transcript of read-only log discovery metadata.",
+      "tools": [
+        {
+          "id": "local-logs.search_events",
+          "serverId": "local-logs",
+          "serverTitle": "Local Logs MCP",
+          "name": "search_events",
+          "description": "Search recent checkout error events by service, release, trace id, and time window.",
+          "category": "error tracking and logs",
+          "permissionLevel": "read",
+          "riskLevel": "medium",
+          "tags": [
+            "mcp",
+            "discovered",
+            "read-only"
+          ]
+        },
+        {
+          "id": "local-logs.get_trace",
+          "serverId": "local-logs",
+          "serverTitle": "Local Logs MCP",
+          "name": "get_trace",
+          "description": "Read one trace with stack frames, request metadata, environment, and release version.",
+          "category": "error tracking and logs",
+          "permissionLevel": "read",
+          "riskLevel": "medium",
+          "tags": [
+            "mcp",
+            "discovered",
+            "read-only"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "local-repo",
+      "title": "Local Repo MCP",
+      "category": "source repository",
+      "description": "Project-local transcript of repository discovery metadata.",
+      "tools": [
+        {
+          "id": "local-repo.search_code",
+          "serverId": "local-repo",
+          "serverTitle": "Local Repo MCP",
+          "name": "search_code",
+          "description": "Search repository files, symbols, tests, config, and ownership hints.",
+          "category": "source repository",
+          "permissionLevel": "read",
+          "riskLevel": "medium",
+          "tags": [
+            "mcp",
+            "discovered",
+            "read-only"
+          ]
+        },
+        {
+          "id": "local-repo.delete_branch",
+          "serverId": "local-repo",
+          "serverTitle": "Local Repo MCP",
+          "name": "delete_branch",
+          "description": "Delete a branch and remove its remote references.",
+          "category": "source repository",
+          "permissionLevel": "admin",
+          "riskLevel": "high",
+          "tags": [
+            "mcp",
+            "discovered",
+            "destructive"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+MCP Capability Runtime Discovery
+================================
+
+Source                   tools-list-transcript
+Servers discovered       2
+Raw tools discovered     4
+Issues                   0
+toolsExecuted=false
+
+Discovered servers
+- local-logs: 2 tools
+- local-repo: 2 tools
+
+Boundary
+- reads a caller-supplied local tools/list transcript
+- normalizes tool metadata into the raw-only tool surface used by tax --input
+- no tools/call requests were made; no real MCP tools were called
