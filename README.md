@@ -8,14 +8,18 @@ The current repository name, `mcp-capability-runtime`, is temporary. The final n
 
 ## Quickstart
 
+Requires Node.js 22 or newer.
+
 ```bash
 npm install
 npm test
 npm run demo:tax
 npm run example:tax
+npm run raw:tax
+npm run pack:check
 ```
 
-The demo and external JSON example are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, or real MCP transports.
+The demo, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real tool execution.
 
 ## What The Demo Shows
 
@@ -72,14 +76,22 @@ The token estimate is a documented heuristic, not a model tokenizer. It is meant
 
 ## External JSON Input
 
-You can run the tax meter against a static, read-only MCP-like tool surface:
+You can run the tax meter against a static, read-only MCP-like tool surface with a proposed capability surface:
 
 ```bash
 npm run build
 node dist/src/cli.js tax --input examples/minimal-tool-surface.json
 ```
 
-The input file contains raw MCP-like servers plus a proposed cleaned capability surface. The loader validates the file before running the tax meter and reports malformed fields with paths like `servers[0].tools[0].permissionLevel`.
+You can also measure a raw-only surface before writing capabilities:
+
+```bash
+npm run raw:tax
+```
+
+Raw-only reports show the raw tool count, estimated prompt-token cost, risky tools, noisy tools, and duplicate groups. They intentionally skip reduction numbers because there is no cleaned capability surface to compare against.
+
+The input file always contains raw MCP-like servers. The `capabilities` array is optional. When capabilities are provided, the loader validates both the JSON shape and the semantic honesty of the capability surface before running the tax meter. For example, a capability cannot claim `read` permission while wrapping an `admin` tool.
 
 See [docs/external-input.md](docs/external-input.md) for the format and how this evolves toward real MCP server discovery.
 
@@ -103,6 +115,7 @@ Public exports include:
 - capability and raw tool types
 - the local 10-server demo fixture
 - the cleaned capability surface
+- semantic capability surface audit
 - prompt token estimation
 - tax-meter calculation
 - text report rendering
@@ -112,7 +125,7 @@ Public exports include:
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 adds a static JSON input path so developers can measure non-demo tool surfaces without editing source code. Future versions can add a real MCP adapter/router that reads existing MCP servers and presents a capability surface to agents.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightens that path with raw-only input, package checks, and semantic capability audits. Future versions can add a real read-only MCP discovery adapter that reads tool metadata from existing MCP servers and then presents a capability surface to agents.
 
 ## V1 Scope
 
@@ -128,6 +141,9 @@ This first slice includes:
 - tests
 - GitHub Actions CI
 - static external JSON input
+- raw-only external JSON input
+- semantic capability surface audit
+- package dry-run check
 
 ## Out Of Scope For V1
 
@@ -144,7 +160,7 @@ This repo intentionally does not yet include:
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) for the next milestones: real MCP adapter, capability router, receipts/proof, incident-to-PR runner, and naming research.
+See [docs/roadmap.md](docs/roadmap.md) for the next milestones: read-only MCP discovery, capability router, receipts/proof, incident-to-PR runner, and naming research.
 
 ## Long-Term Direction
 

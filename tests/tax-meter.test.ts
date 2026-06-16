@@ -38,6 +38,7 @@ test("cleaned capability surface is smaller and keeps proof metadata", () => {
 test("tax meter reports count, token, risk, noise, and duplicate reductions", () => {
   const report = computeTaxMeter(demoServers, demoCapabilities);
 
+  assert.equal(report.mode, "comparison");
   assert.equal(report.rawToolCount, 40);
   assert.equal(report.capabilityCount, 8);
   assert.equal(report.riskyRawToolCount, 9);

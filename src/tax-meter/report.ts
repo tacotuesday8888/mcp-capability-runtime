@@ -10,14 +10,20 @@ export function renderTaxMeterReport(report: TaxMeterReport): string {
     "================================",
     "",
     `Raw MCP-like surface      ${report.rawToolCount} tools (~${report.rawEstimatedTokens} prompt tokens)`,
-    `Capability surface        ${report.capabilityCount} capabilities (~${report.capabilityEstimatedTokens} prompt tokens)`,
+    report.mode === "comparison"
+      ? `Capability surface        ${report.capabilityCount} capabilities (~${report.capabilityEstimatedTokens} prompt tokens)`
+      : "Capability surface        not provided",
     "",
-    `Tool count reduction      ${report.toolCountReductionPercent}%`,
-    `Token estimate reduction  ${report.tokenReductionPercent}%`,
-    `Risky exposure reduction  ${report.riskyExposureReductionPercent}%`,
+    ...(report.mode === "comparison"
+      ? [
+          `Tool count reduction      ${report.toolCountReductionPercent}%`,
+          `Token estimate reduction  ${report.tokenReductionPercent}%`,
+          `Risky exposure reduction  ${report.riskyExposureReductionPercent}%`,
+        ]
+      : ["No capability surface was provided, so reduction metrics are not shown."]),
     "",
     `Risky raw tools           ${report.riskyRawToolCount}`,
-    `Risky capabilities        ${report.riskyCapabilityCount}`,
+    report.mode === "comparison" ? `Risky capabilities        ${report.riskyCapabilityCount}` : null,
     `Noisy raw tools           ${report.noisyRawToolCount}`,
     `Duplicate raw tools       ${report.duplicateRawToolCount}`,
     "",
@@ -26,5 +32,7 @@ export function renderTaxMeterReport(report: TaxMeterReport): string {
     "",
     "Heuristic: token estimates count word-like chunks in tool and capability metadata, multiply by 1.15,",
     "and add a small structural cost for arrays. This is a deterministic prompt-budget proxy, not a tokenizer.",
-  ].join("\n");
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
 }

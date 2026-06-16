@@ -9,29 +9,47 @@ export function isRisky(permissionLevel: string, riskLevel: string): boolean {
   return permissionLevel === "admin" || riskLevel === "high";
 }
 
-export function computeTaxMeter(servers: McpLikeServer[], capabilities: Capability[]): TaxMeterReport {
+export function computeTaxMeter(servers: McpLikeServer[], capabilities?: Capability[]): TaxMeterReport {
   const tools = flattenTools(servers);
   const duplicateToolGroups = findDuplicateToolGroups(tools);
   const rawEstimatedTokens = tools.reduce((total, rawTool) => total + estimateRawToolTokens(rawTool), 0);
+  const riskyRawToolCount = tools.filter((tool) => isRisky(tool.permissionLevel, tool.riskLevel)).length;
+  const baseReport = {
+    rawToolCount: tools.length,
+    rawEstimatedTokens,
+    riskyRawToolCount,
+    noisyRawToolCount: tools.filter((tool) => tool.noisy === true).length,
+    duplicateRawToolCount: duplicateToolGroups.reduce((total, group) => total + group.tools.length, 0),
+    duplicateToolGroups,
+  };
+
+  if (capabilities === undefined || capabilities.length === 0) {
+    return {
+      mode: "raw-only",
+      ...baseReport,
+      capabilityCount: null,
+      capabilityEstimatedTokens: null,
+      riskyCapabilityCount: null,
+      toolCountReductionPercent: null,
+      tokenReductionPercent: null,
+      riskyExposureReductionPercent: null,
+    };
+  }
+
   const capabilityEstimatedTokens = capabilities.reduce(
     (total, capability) => total + estimateCapabilityTokens(capability),
     0,
   );
-  const riskyRawToolCount = tools.filter((tool) => isRisky(tool.permissionLevel, tool.riskLevel)).length;
   const riskyCapabilityCount = capabilities.filter((capability) =>
     isRisky(capability.permissionLevel, capability.riskLevel),
   ).length;
 
   return {
-    rawToolCount: tools.length,
+    mode: "comparison",
+    ...baseReport,
     capabilityCount: capabilities.length,
-    rawEstimatedTokens,
     capabilityEstimatedTokens,
-    riskyRawToolCount,
     riskyCapabilityCount,
-    noisyRawToolCount: tools.filter((tool) => tool.noisy === true).length,
-    duplicateRawToolCount: duplicateToolGroups.reduce((total, group) => total + group.tools.length, 0),
-    duplicateToolGroups,
     toolCountReductionPercent: percentReduction(tools.length, capabilities.length),
     tokenReductionPercent: percentReduction(rawEstimatedTokens, capabilityEstimatedTokens),
     riskyExposureReductionPercent: percentReduction(riskyRawToolCount, riskyCapabilityCount),

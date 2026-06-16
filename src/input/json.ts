@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 
+import { auditToolSurface } from "../capabilities/audit.js";
 import type { Capability, McpLikeServer, PermissionLevel, RawTool, RiskLevel } from "../types.js";
 
 const permissionLevels = new Set<PermissionLevel>(["read", "write", "execute", "admin"]);
@@ -10,7 +11,7 @@ type JsonRecord = Record<string, unknown>;
 export interface ToolSurfaceInput {
   name?: string;
   servers: McpLikeServer[];
-  capabilities: Capability[];
+  capabilities?: Capability[];
 }
 
 export class ToolSurfaceValidationError extends Error {
@@ -51,18 +52,31 @@ export function parseToolSurfaceInput(input: unknown): ToolSurfaceInput {
   const issues: string[] = [];
   const name = readOptionalString(input, "name", issues);
   const servers = readServers(input.servers, "servers", issues);
-  const capabilities = readCapabilities(input.capabilities, "capabilities", issues);
+  const capabilities = input.capabilities === undefined ? undefined : readCapabilities(input.capabilities, "capabilities", issues);
+
+  if (input.capabilities !== undefined && capabilities !== undefined && capabilities.length === 0) {
+    issues.push("capabilities must be omitted for raw-only mode or contain at least one capability");
+  }
 
   if (issues.length > 0) {
     throw new ToolSurfaceValidationError(issues);
   }
 
+  const audit = auditToolSurface(servers, capabilities);
+
+  if (!audit.valid) {
+    throw new ToolSurfaceValidationError(audit.issues.map((issue) => issue.message));
+  }
+
   const surface = {
     servers,
-    capabilities,
   };
 
-  return name === undefined ? surface : { ...surface, name };
+  return {
+    ...surface,
+    ...(name === undefined ? {} : { name }),
+    ...(capabilities === undefined ? {} : { capabilities }),
+  };
 }
 
 function readServers(value: unknown, path: string, issues: string[]): McpLikeServer[] {

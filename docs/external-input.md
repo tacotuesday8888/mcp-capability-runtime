@@ -1,13 +1,19 @@
 # External JSON Input
 
-The v0.2 input path lets users run the tax meter on a static, read-only MCP-like tool surface without editing source code.
+The external input path lets users run the tax meter on a static, read-only MCP-like tool surface without editing source code.
 
-This does not discover, authenticate to, or execute real MCP servers. It only reads a local JSON file, validates it, normalizes server metadata onto each tool, and runs the same tax-meter calculation used by the built-in demo.
+This does not discover, authenticate to, or execute real MCP servers. It only reads a local JSON file, validates it, normalizes server metadata onto each tool, audits any provided capability surface, and runs the same tax-meter calculation used by the built-in demo.
 
 ## Run It
 
 ```bash
 npm run example:tax
+```
+
+Run a raw-only surface before writing capabilities:
+
+```bash
+npm run raw:tax
 ```
 
 Or pass a file directly after building:
@@ -29,7 +35,7 @@ The root JSON object has:
 
 - `name`: optional label for the surface
 - `servers`: raw MCP-like servers and their tools
-- `capabilities`: the proposed cleaned capability surface to compare against
+- `capabilities`: optional proposed cleaned capability surface to compare against
 
 Each server has `id`, `title`, `category`, `description`, and `tools`.
 
@@ -47,6 +53,21 @@ Each tool has:
 Each capability follows the public capability contract in [capability-contract.md](./capability-contract.md).
 
 See [minimal-tool-surface.json](../examples/minimal-tool-surface.json) for a complete example.
+See [raw-tool-surface.json](../examples/raw-tool-surface.json) for a raw-only example with no `capabilities` array.
+
+## Raw-Only Mode
+
+Capabilities are optional because a developer may want to measure the current tool-list tax before designing a cleaned surface.
+
+When `capabilities` is missing, the report runs in raw-only mode. It still shows:
+
+- raw tool count
+- estimated prompt-token cost
+- risky raw tools
+- noisy raw tools
+- duplicate raw tools and duplicate groups
+
+It does not show tool count reduction, token reduction, or risky exposure reduction because those numbers require a capability surface to compare against.
 
 ## Validation
 
@@ -58,8 +79,18 @@ Invalid tool surface input:
 - servers[0].tools[0].riskLevel must be one of: low, medium, high
 ```
 
+When capabilities are provided, the loader also runs the semantic capability surface audit. The audit rejects:
+
+- duplicate server, tool, or capability IDs
+- capability `underlyingTools` entries that do not point to real raw tools
+- capabilities that understate the highest permission level of the tools they wrap
+- capabilities that understate the highest risk level of the tools they wrap
+- empty `requiredContext`, `underlyingTools`, `proofReturned`, or `examples` arrays
+
+This keeps the cleaned surface honest. A capability can simplify the agent-facing choice, but it cannot hide that it wraps an admin or high-risk tool.
+
 ## Path To Real MCP Discovery
 
 This file format is the bridge between the local fixture and real MCP discovery.
 
-Near-term, an adapter can inspect real MCP servers and write this same JSON shape as a read-only snapshot. Later, the runtime can replace static files with live discovery and capability routing while preserving the same core questions: what the agent should see, when it should see it, what it may do, what context it needs, and what proof it returns.
+For v0.3, the acceptance target is a read-only discovery shape: inspect configured MCP server metadata, write this same raw tool-surface JSON, and run the tax meter without executing tools or handling real OAuth. Later, the runtime can replace static files with live discovery and capability routing while preserving the same core questions: what the agent should see, when it should see it, what it may do, what context it needs, and what proof it returns.

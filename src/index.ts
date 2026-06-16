@@ -1,3 +1,4 @@
+export { auditToolSurface } from "./capabilities/audit.js";
 export { demoCapabilities, demoServers } from "./demo/fixture.js";
 export { loadToolSurfaceFile, parseToolSurfaceInput, ToolSurfaceValidationError } from "./input/json.js";
 export { estimatePromptTokens } from "./tax-meter/estimate.js";
@@ -12,4 +13,7 @@ export type {
   RawTool,
   RiskLevel,
   TaxMeterReport,
+  ToolSurfaceAuditCode,
+  ToolSurfaceAuditIssue,
+  ToolSurfaceAuditReport,
 } from "./types.js";

@@ -5,6 +5,7 @@ import {
   computeTaxMeter,
   demoCapabilities,
   demoServers,
+  loadToolSurfaceFile,
   renderTaxMeterReport,
 } from "../src/index.js";
 
@@ -18,4 +19,15 @@ test("tax meter report renders a stable before and after summary", () => {
   assert.match(report, /Noisy raw tools\s+8/);
   assert.match(report, /incident-evidence-search/);
   assert.match(report, /Heuristic:/);
+});
+
+test("tax meter report renders raw-only surfaces without fake reductions", () => {
+  const surface = loadToolSurfaceFile("examples/raw-tool-surface.json");
+  const report = renderTaxMeterReport(computeTaxMeter(surface.servers, surface.capabilities));
+
+  assert.match(report, /Raw MCP-like surface\s+4 tools/);
+  assert.match(report, /Capability surface\s+not provided/);
+  assert.match(report, /No capability surface was provided/);
+  assert.doesNotMatch(report, /Tool count reduction\s+\d+%/);
+  assert.doesNotMatch(report, /Token estimate reduction\s+\d+%/);
 });

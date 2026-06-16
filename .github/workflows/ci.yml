@@ -11,8 +11,14 @@ permissions:
 
 jobs:
   verify:
-    name: Verify
+    name: Verify Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 22.x
+          - 24.x
 
     steps:
       - name: Check out repository
@@ -21,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
@@ -41,3 +47,9 @@ jobs:
 
       - name: External JSON tax meter
         run: npm run example:tax
+
+      - name: Raw JSON tax meter
+        run: npm run raw:tax
+
+      - name: Package dry-run
+        run: npm run pack:check

@@ -7,10 +7,13 @@ test("GitHub Actions CI runs the public verification commands", () => {
 
   assert.match(workflow, /actions\/checkout@v6/);
   assert.match(workflow, /actions\/setup-node@v6/);
-  assert.match(workflow, /node-version: 24/);
+  assert.match(workflow, /22\.x/);
+  assert.match(workflow, /24\.x/);
   assert.match(workflow, /npm ci/);
   assert.match(workflow, /npm run typecheck/);
   assert.match(workflow, /npm test/);
   assert.match(workflow, /npm run demo:tax/);
   assert.match(workflow, /npm run example:tax/);
+  assert.match(workflow, /npm run raw:tax/);
+  assert.match(workflow, /npm run pack:check/);
 });

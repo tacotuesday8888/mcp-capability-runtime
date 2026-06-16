@@ -43,17 +43,53 @@ export interface DuplicateToolGroup {
   tools: string[];
 }
 
-export interface TaxMeterReport {
+interface BaseTaxMeterReport {
   rawToolCount: number;
-  capabilityCount: number;
   rawEstimatedTokens: number;
-  capabilityEstimatedTokens: number;
   riskyRawToolCount: number;
-  riskyCapabilityCount: number;
   noisyRawToolCount: number;
   duplicateRawToolCount: number;
   duplicateToolGroups: DuplicateToolGroup[];
+}
+
+export interface ComparisonTaxMeterReport extends BaseTaxMeterReport {
+  mode: "comparison";
+  capabilityCount: number;
+  capabilityEstimatedTokens: number;
+  riskyCapabilityCount: number;
   toolCountReductionPercent: number;
   tokenReductionPercent: number;
   riskyExposureReductionPercent: number;
+}
+
+export interface RawOnlyTaxMeterReport extends BaseTaxMeterReport {
+  mode: "raw-only";
+  capabilityCount: null;
+  capabilityEstimatedTokens: null;
+  riskyCapabilityCount: null;
+  toolCountReductionPercent: null;
+  tokenReductionPercent: null;
+  riskyExposureReductionPercent: null;
+}
+
+export type TaxMeterReport = ComparisonTaxMeterReport | RawOnlyTaxMeterReport;
+
+export type ToolSurfaceAuditCode =
+  | "duplicate-server-id"
+  | "duplicate-tool-id"
+  | "duplicate-capability-id"
+  | "missing-underlying-tool"
+  | "understated-permission-level"
+  | "understated-risk-level"
+  | "empty-required-array";
+
+export interface ToolSurfaceAuditIssue {
+  code: ToolSurfaceAuditCode;
+  path: string;
+  message: string;
+}
+
+export interface ToolSurfaceAuditReport {
+  valid: boolean;
+  issues: ToolSurfaceAuditIssue[];
 }

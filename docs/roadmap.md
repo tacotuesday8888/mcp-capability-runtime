@@ -9,11 +9,28 @@ This repo is still using a temporary name. Naming research comes later; do not t
 - Validation errors that point to malformed fields.
 - Documentation for the external input path.
 
-## v0.3: Real MCP Adapter
+## v0.3: Read-Only Discovery Foundation
 
-- Inspect configured MCP servers without executing their tools.
-- Produce the same raw tool-surface shape used by the v0.2 JSON path.
-- Keep authentication, OAuth, and production-grade transport hardening out of scope until the adapter contract is clear.
+Acceptance criteria:
+
+- Require Node.js 22 or newer in package metadata and CI.
+- Support a raw-only external input file where `capabilities` is optional.
+- Add `npm run raw:tax` so users can measure the raw surface before designing capabilities.
+- Add `npm run pack:check` so the package contents can be inspected before publishing.
+- Audit capability surfaces semantically, not just by JSON shape.
+- Reject duplicate server, tool, and capability IDs.
+- Reject capabilities that reference missing raw tools.
+- Reject capabilities that understate wrapped tool permission or risk.
+- Reject empty required capability arrays for context, tools, proof, and examples.
+- Keep the next adapter target read-only: inspect configured MCP server metadata and produce the same raw tool-surface shape without executing tools.
+
+Still out of scope for v0.3:
+
+- real OAuth
+- real SaaS integrations
+- real tool execution
+- production-grade transport hardening
+- a full MCP router
 
 ## v0.4: Capability Router
 
