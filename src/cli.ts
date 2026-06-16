@@ -20,7 +20,7 @@ function printHelp(): void {
       "",
       "Commands:",
       "  tax        Run the tax meter. Defaults to the built-in demo fixture.",
-      "  select     Select a task-scoped capability surface and print a dry-run receipt.",
+      "  select     Select a task-scoped capability surface and print a dry-run selection report.",
       "  demo:tax   Alias for tax --demo.",
       "",
       "Tax options:",
@@ -33,7 +33,7 @@ function printHelp(): void {
       "  --max-permission <level>   read, write, execute, or admin. Defaults to read.",
       "  --max-risk <level>         low, medium, or high. Defaults to medium.",
       "  --limit <count>            Maximum selected capabilities. Defaults to 5.",
-      "  --json                     Print a stable JSON receipt.",
+      "  --json                     Print a stable JSON selection report.",
       "  -h, --help       Show this help.",
     ].join("\n"),
   );

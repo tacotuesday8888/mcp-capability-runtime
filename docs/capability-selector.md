@@ -1,6 +1,6 @@
 # Capability Selector
 
-The selector is the v0.4 proof that the capability surface is not only smaller than raw tools, but also task-scoped.
+The selector is the proof that the capability surface is not only smaller than raw tools, but also task-scoped.
 
 In plain English: instead of handing an agent every capability up front, the selector asks, "For this task, with this context, and under this permission limit, what should the agent see now?"
 
@@ -21,6 +21,12 @@ node dist/src/cli.js select --demo \
   --context symptom=500
 ```
 
+Run the same selector against the external JSON example:
+
+```bash
+npm run example:select
+```
+
 ## Conservative Defaults
 
 The selector defaults to:
@@ -31,7 +37,16 @@ The selector defaults to:
 
 That means write, execute, admin, and high-risk capabilities are not selected unless the caller explicitly raises the ceiling.
 
-## What The Receipt Shows
+## Surface And Receipt
+
+The JSON output separates two concerns:
+
+- `surface`: the agent-facing capabilities for this task. It contains capability contract fields such as `description`, `intent`, `whenToUse`, `requiredContext`, permission, risk, proof, and examples. It does not expose blocked capability tools.
+- `receipt`: the developer-facing audit trail. It contains selected IDs, selected decision details, blocked reasons, exposed underlying tools for selected capabilities, selected prompt-token estimate, and `toolsExecuted: false`.
+
+The older top-level fields remain for now so early callers can migrate gradually.
+
+## What The Text Report Shows
 
 The text report shows:
 
@@ -55,7 +70,7 @@ node dist/src/cli.js select --demo \
   --json
 ```
 
-The JSON receipt is deterministic and local. It is not a runtime proof trail yet; it is the first selection receipt that shows what the runtime would expose before any tool execution exists.
+The JSON selection report is deterministic and local. It is not a runtime proof trail yet; it includes the first selection receipt that shows what the runtime would expose before any tool execution exists.
 
 ## Scope
 

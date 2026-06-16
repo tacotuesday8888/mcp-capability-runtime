@@ -16,6 +16,7 @@ npm test
 npm run demo:tax
 npm run demo:select
 npm run example:tax
+npm run example:select
 npm run raw:tax
 npm run pack:check
 ```
@@ -93,7 +94,7 @@ Task                     Investigate checkout 500s from the last 30 minutes
 Policy                   permission <= read, risk <= medium
 Provided context         service=checkout; timeWindow=30m; symptom=500
 
-Selected capabilities    1 of 8 (~110 prompt tokens, 5 underlying tools)
+Selected capabilities    1 of 8 (~99 prompt tokens, 5 underlying tools)
 - triage-production-incident (read/medium, score 24)
   matched: 30, checkout, investigate, last, minutes
   proof: event ids; trace id; release id; log query; chat permalink
@@ -109,9 +110,12 @@ Dry-run receipt
 - no tools were executed
 ```
 
-By default, selection is conservative: permission is capped at `read`, risk is capped at `medium`, and no tools run. The receipt explains which capabilities were selected, which were blocked, what context is missing, and what proof selected capabilities should return.
+By default, selection is conservative: permission is capped at `read`, risk is capped at `medium`, and no tools run. The machine-readable result now separates two views:
 
-See [docs/capability-selector.md](docs/capability-selector.md) for selector options and JSON receipt output.
+- `surface`: the agent-facing capability surface for the current task
+- `receipt`: the developer-facing audit trail explaining selected decision details, blocking, exposed tools, token estimate, and the fact that no tools ran
+
+See [docs/capability-selector.md](docs/capability-selector.md) for selector options and JSON selection report output.
 
 ## External JSON Input
 
@@ -152,7 +156,8 @@ const selected = selectCapabilities(demoCapabilities, {
 });
 
 console.log(renderTaxMeterReport(report));
-console.log(selected.selected.map((capability) => capability.capabilityId));
+console.log(selected.surface.capabilities.map((capability) => capability.id));
+console.log(selected.receipt.selectedCapabilityIds);
 ```
 
 Public exports include:
@@ -161,7 +166,7 @@ Public exports include:
 - the local 10-server demo fixture
 - the cleaned capability surface
 - semantic capability surface audit
-- task-scoped capability selection
+- task-scoped capability selection with separate surface and receipt outputs
 - prompt token estimation
 - tax-meter calculation
 - text report rendering
@@ -171,7 +176,7 @@ Public exports include:
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 adds task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. Future versions can add a real read-only MCP discovery adapter that reads tool metadata from existing MCP servers and then presents a capability surface to agents.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. Future versions can add a real read-only MCP discovery adapter that reads tool metadata from existing MCP servers and then presents a capability surface to agents.
 
 ## V1 Scope
 
@@ -191,6 +196,7 @@ This first slice includes:
 - semantic capability surface audit
 - package dry-run check
 - task-scoped selector with dry-run receipt
+- separate selected surface and developer receipt outputs
 
 ## Out Of Scope For V1
 
@@ -207,7 +213,7 @@ This repo intentionally does not yet include:
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) for the next milestones: read-only MCP discovery, capability router, receipts/proof, incident-to-PR runner, and naming research.
+See [docs/roadmap.md](docs/roadmap.md) for the next milestones: executable receipts/proof, read-only MCP discovery, the incident-to-PR runner, and naming research.
 
 ## Long-Term Direction
 

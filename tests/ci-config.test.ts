@@ -16,5 +16,6 @@ test("GitHub Actions CI runs the public verification commands", () => {
   assert.match(workflow, /npm run example:tax/);
   assert.match(workflow, /npm run raw:tax/);
   assert.match(workflow, /npm run demo:select/);
+  assert.match(workflow, /npm run example:select/);
   assert.match(workflow, /npm run pack:check/);
 });

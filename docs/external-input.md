@@ -60,12 +60,7 @@ See [raw-tool-surface.json](../examples/raw-tool-surface.json) for a raw-only ex
 When an input file includes capabilities, it can also drive the task-scoped selector:
 
 ```bash
-npm run build
-node dist/src/cli.js select --input examples/minimal-tool-surface.json \
-  --task "Investigate checkout logs" \
-  --context service=checkout \
-  --context timeWindow=30m \
-  --context symptom=500
+npm run example:select
 ```
 
 Raw-only input is accepted by the tax meter but not by `select`, because selection needs capabilities to choose from.
@@ -108,4 +103,4 @@ This keeps the cleaned surface honest. A capability can simplify the agent-facin
 
 This file format is the bridge between the local fixture and real MCP discovery.
 
-For v0.3, the acceptance target is a read-only discovery shape: inspect configured MCP server metadata, write this same raw tool-surface JSON, and run the tax meter without executing tools or handling real OAuth. Later, the runtime can replace static files with live discovery and capability routing while preserving the same core questions: what the agent should see, when it should see it, what it may do, what context it needs, and what proof it returns.
+The adapter target is a read-only discovery shape: inspect configured MCP server metadata, write this same raw tool-surface JSON, and run the tax meter or selector without executing tools or handling real OAuth. Later, the runtime can replace static files with live discovery and capability routing while preserving the same core questions: what the agent should see, when it should see it, what it may do, what context it needs, and what proof it returns.

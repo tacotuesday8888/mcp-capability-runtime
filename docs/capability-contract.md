@@ -52,7 +52,7 @@ When `capabilities` is omitted, the tax meter reports the raw surface only and s
 
 ## Selection Contract
 
-In v0.4, capabilities can be selected for one task without exposing the whole surface.
+Capabilities can be selected for one task without exposing the whole surface.
 
 The selector request includes:
 
@@ -62,14 +62,23 @@ The selector request includes:
 - maximum risk level
 - result limit
 
-The selector returns a dry-run receipt with:
+The selector returns an agent-facing `surface` with:
 
 - selected capability IDs
+- descriptions, intent, and when-to-use guidance
+- required context
+- permission and risk labels
+- expected proof returned
+- examples
+
+The selector also returns a developer-facing `receipt` with:
+
+- selected capability IDs
+- selected decision details, including scores, matched task terms, required context matches, expected proof, and exposed selected tool IDs
 - blocked capability IDs and reasons
 - missing required context
-- matched task terms
-- expected proof returned
-- exposed underlying tool IDs
+- exposed underlying tool IDs for selected capabilities
 - estimated prompt-token cost of the selected surface
+- `toolsExecuted: false`
 
 The default permission ceiling is `read`, and the default risk ceiling is `medium`. That keeps the first selector conservative: write, execute, admin, and high-risk capabilities must be explicitly allowed before they can appear in the selected surface.

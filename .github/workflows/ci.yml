@@ -54,5 +54,8 @@ jobs:
       - name: Demo capability selector
         run: npm run demo:select
 
+      - name: External JSON capability selector
+        run: npm run example:select
+
       - name: Package dry-run
         run: npm run pack:check

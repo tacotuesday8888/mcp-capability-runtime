@@ -42,7 +42,7 @@ Acceptance criteria:
 - Return blocked capabilities with reasons such as missing context, permission limit, risk limit, no task match, or over-limit.
 - Return a dry-run receipt with selected IDs, expected proof, exposed underlying tools, and selected prompt-token estimate.
 - Add a CLI command that runs selection against the demo or an external JSON input with capabilities.
-- Add JSON receipt output for automation.
+- Add JSON selection report output for automation.
 - Keep the implementation deterministic, local, and free of real tool execution.
 
 Still out of scope for v0.4:
@@ -53,19 +53,26 @@ Still out of scope for v0.4:
 - production sandboxing
 - end-to-end incident-to-PR automation
 
-## v0.5: Receipts And Proof
+## v0.5: Surface And Receipt Split
+
+- Separate the agent-facing selected capability surface from the developer-facing selection receipt.
+- Keep selected surfaces focused on capability contract fields, without exposing blocked tool details.
+- Keep receipts deterministic and local, with selected IDs, selected decision details, blocked reasons, exposed selected tools, token estimate, and `toolsExecuted: false`.
+- Add launch checks for checked-in demo output and external selector input.
+
+## v0.6: Receipts And Proof
 
 - Turn dry-run selection receipts into execution receipts once local fake tool execution exists.
 - Show what the agent saw, selected, attempted, changed, and proved.
 - Keep the first executable receipt local and deterministic.
 
-## v0.6: Read-Only MCP Discovery
+## v0.7: Read-Only MCP Discovery
 
 - Inspect configured MCP servers without executing their tools.
 - Produce the same raw tool-surface shape used by the JSON path.
 - Keep authentication, OAuth, and production-grade transport hardening out of scope until the adapter contract is clear.
 
-## v0.7: Incident-To-PR Runner
+## v0.8: Incident-To-PR Runner
 
 - Build the flagship demo path: 10 MCP servers, one production incident, one clean PR.
 - Use fake local developer tools first.

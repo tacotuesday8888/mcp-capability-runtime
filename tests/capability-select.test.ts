@@ -31,6 +31,28 @@ test("selects read-scoped incident capabilities with a dry-run receipt", () => {
   assert.ok(blockedIds.includes("merge-reviewed-pull-request"));
 });
 
+test("returns an agent-facing surface separate from the developer receipt", () => {
+  const report = selectCapabilities(demoCapabilities, {
+    task: "Investigate checkout 500s",
+    context: ["service=checkout", "timeWindow=30m", "symptom=500"],
+  });
+
+  assert.equal(report.surface.mode, "selected-surface");
+  assert.equal(report.surface.capabilities[0]?.id, "triage-production-incident");
+  assert.equal(report.surface.capabilities[0]?.description.length > 0, true);
+  assert.equal(report.surface.capabilities[0]?.intent.length > 0, true);
+  assert.equal(report.surface.capabilities[0]?.whenToUse.length > 0, true);
+  assert.deepEqual(report.surface.capabilities[0]?.underlyingTools, undefined);
+
+  assert.equal(report.receipt.mode, "selection-receipt");
+  assert.equal(report.receipt.toolsExecuted, false);
+  assert.deepEqual(report.receipt.selectedCapabilityIds, ["triage-production-incident"]);
+  assert.equal(report.receipt.selected[0]?.capabilityId, "triage-production-incident");
+  assert.ok(report.receipt.selected[0]?.matchedTerms.includes("checkout"));
+  assert.ok(report.receipt.exposedUnderlyingTools.includes("error.searchEvents"));
+  assert.equal(report.receipt.selectedEstimatedTokens, report.selectedEstimatedTokens);
+});
+
 test("blocks capabilities that exceed the permission or risk ceiling", () => {
   const report = selectCapabilities(demoCapabilities, {
     task: "Merge reviewed pull request after CI is green",
@@ -114,13 +136,13 @@ test("normalizes invalid public API limits to a conservative default", () => {
   assert.equal(report.selected[0]?.capabilityId, "triage-production-incident");
 });
 
-test("estimates selected tokens from the full selected capability metadata", () => {
+test("estimates selected tokens from the agent-facing selected surface", () => {
   const report = selectCapabilities(demoCapabilities, {
     task: "Investigate checkout 500s",
     context: ["service=checkout", "timeWindow=30m", "symptom=500"],
   });
 
-  assert.equal(report.selectedEstimatedTokens, 110);
+  assert.equal(report.selectedEstimatedTokens, 99);
 });
 
 test("renders a readable selector report", () => {
@@ -165,7 +187,7 @@ test("CLI can run task-scoped selection against the demo surface", () => {
   assert.equal(result.stderr, "");
 });
 
-test("CLI can print a stable JSON selection receipt", () => {
+test("CLI can print a stable JSON selection report", () => {
   const result = spawnSync(
     process.execPath,
     [
@@ -190,13 +212,27 @@ test("CLI can print a stable JSON selection receipt", () => {
 
   assert.equal(result.status, 0);
 
-  const parsed = JSON.parse(result.stdout) as { selected: Array<{ capabilityId: string }> };
+  const parsed = JSON.parse(result.stdout) as {
+    selected: Array<{ capabilityId: string }>;
+    surface: { capabilities: Array<{ id: string; underlyingTools?: string[] }> };
+    receipt: {
+      selectedCapabilityIds: string[];
+      selected: Array<{ capabilityId: string; matchedTerms: string[] }>;
+      toolsExecuted: boolean;
+    };
+  };
 
   assert.equal(parsed.selected[0]?.capabilityId, "triage-production-incident");
+  assert.equal(parsed.surface.capabilities[0]?.id, "triage-production-incident");
+  assert.equal(parsed.surface.capabilities[0]?.underlyingTools, undefined);
+  assert.deepEqual(parsed.receipt.selectedCapabilityIds, ["triage-production-incident"]);
+  assert.equal(parsed.receipt.selected[0]?.capabilityId, "triage-production-incident");
+  assert.ok(parsed.receipt.selected[0]?.matchedTerms.includes("checkout"));
+  assert.equal(parsed.receipt.toolsExecuted, false);
   assert.equal(result.stderr, "");
 });
 
-test("JSON receipt does not expose tools for blocked capabilities", () => {
+test("JSON selection report does not expose tools for blocked capabilities", () => {
   const result = spawnSync(
     process.execPath,
     [
@@ -230,4 +266,53 @@ test("JSON receipt does not expose tools for blocked capabilities", () => {
   assert.equal(blockedMerge.underlyingTools, undefined);
   assert.equal(blockedMerge.proofReturned, undefined);
   assert.doesNotMatch(result.stdout, /pr\.merge/);
+});
+
+test("CLI can select from an external JSON capability surface", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "dist/src/cli.js",
+      "select",
+      "--input",
+      "examples/minimal-tool-surface.json",
+      "--task",
+      "Investigate checkout logs",
+      "--context",
+      "service=checkout",
+      "--context",
+      "timeWindow=30m",
+      "--context",
+      "symptom=500",
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    },
+  );
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /investigate-checkout-incident/);
+  assert.equal(result.stderr, "");
+});
+
+test("CLI rejects selection for raw-only input", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      "dist/src/cli.js",
+      "select",
+      "--input",
+      "examples/raw-tool-surface.json",
+      "--task",
+      "Investigate checkout logs",
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+    },
+  );
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /select requires a capability surface/);
 });

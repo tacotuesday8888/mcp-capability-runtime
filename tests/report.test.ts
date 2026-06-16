@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -6,7 +7,9 @@ import {
   demoCapabilities,
   demoServers,
   loadToolSurfaceFile,
+  renderCapabilitySelectionReport,
   renderTaxMeterReport,
+  selectCapabilities,
 } from "../src/index.js";
 
 test("tax meter report renders a stable before and after summary", () => {
@@ -30,4 +33,23 @@ test("tax meter report renders raw-only surfaces without fake reductions", () =>
   assert.match(report, /No capability surface was provided/);
   assert.doesNotMatch(report, /Tool count reduction\s+\d+%/);
   assert.doesNotMatch(report, /Token estimate reduction\s+\d+%/);
+});
+
+test("demo tax output matches the checked-in golden example", () => {
+  const expected = readFileSync("examples/demo-tax-output.txt", "utf8").trimEnd();
+  const actual = renderTaxMeterReport(computeTaxMeter(demoServers, demoCapabilities));
+
+  assert.equal(actual, expected);
+});
+
+test("demo selector output matches the checked-in golden example", () => {
+  const expected = readFileSync("examples/demo-select-output.txt", "utf8").trimEnd();
+  const actual = renderCapabilitySelectionReport(
+    selectCapabilities(demoCapabilities, {
+      task: "Investigate checkout 500s from the last 30 minutes",
+      context: ["service=checkout", "timeWindow=30m", "symptom=500"],
+    }),
+  );
+
+  assert.equal(actual, expected);
 });

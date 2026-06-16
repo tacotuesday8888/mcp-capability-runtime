@@ -127,6 +127,26 @@ export interface CapabilitySelection {
   proofReturned: string[];
 }
 
+export interface SelectedCapability {
+  id: string;
+  title: string;
+  description: string;
+  intent: string;
+  whenToUse: string;
+  requiredContext: string[];
+  permissionLevel: PermissionLevel;
+  riskLevel: RiskLevel;
+  proofReturned: string[];
+  examples: string[];
+  underlyingTools?: never;
+}
+
+export interface SelectedCapabilitySurface {
+  mode: "selected-surface";
+  task: string;
+  capabilities: SelectedCapability[];
+}
+
 export interface BlockedCapabilitySelection {
   capabilityId: string;
   title: string;
@@ -137,6 +157,22 @@ export interface BlockedCapabilitySelection {
   matchedContext: string[];
   missingContext: string[];
   reasons: CapabilityBlockReason[];
+}
+
+export interface CapabilitySelectionReceipt {
+  mode: "selection-receipt";
+  task: string;
+  providedContext: string[];
+  maxPermissionLevel: PermissionLevel;
+  maxRiskLevel: RiskLevel;
+  limit: number;
+  selectedCapabilityIds: string[];
+  selected: CapabilitySelection[];
+  blocked: BlockedCapabilitySelection[];
+  exposedUnderlyingTools: string[];
+  exposedToolCount: number;
+  selectedEstimatedTokens: number;
+  toolsExecuted: false;
 }
 
 export interface CapabilitySelectionReport {
@@ -152,4 +188,6 @@ export interface CapabilitySelectionReport {
   exposedUnderlyingTools: string[];
   exposedToolCount: number;
   selectedEstimatedTokens: number;
+  surface: SelectedCapabilitySurface;
+  receipt: CapabilitySelectionReceipt;
 }

@@ -3,6 +3,7 @@ import type {
   CapabilityBlockReason,
   BlockedCapabilitySelection,
   CapabilitySelection,
+  SelectedCapability,
   CapabilitySelectionReport,
   CapabilitySelectionRequest,
 } from "../types.js";
@@ -76,6 +77,30 @@ export function selectCapabilities(
       ),
     );
   const exposedUnderlyingTools = uniqueSorted(selected.flatMap((selection) => selection.underlyingTools));
+  const surface = {
+    mode: "selected-surface" as const,
+    task: request.task,
+    capabilities: selectedCandidates.map((candidate) => toSelectedCapability(candidate.capability)),
+  };
+  const selectedEstimatedTokens = surface.capabilities.reduce(
+    (total, capability) => total + estimateSelectedCapabilitySurfaceTokens(capability),
+    0,
+  );
+  const receipt = {
+    mode: "selection-receipt" as const,
+    task: request.task,
+    providedContext,
+    maxPermissionLevel,
+    maxRiskLevel,
+    limit,
+    selectedCapabilityIds: selected.map((selection) => selection.capabilityId),
+    selected,
+    blocked,
+    exposedUnderlyingTools,
+    exposedToolCount: exposedUnderlyingTools.length,
+    selectedEstimatedTokens,
+    toolsExecuted: false as const,
+  };
 
   return {
     mode: "selection",
@@ -89,10 +114,9 @@ export function selectCapabilities(
     blocked,
     exposedUnderlyingTools,
     exposedToolCount: exposedUnderlyingTools.length,
-    selectedEstimatedTokens: selectedCandidates.reduce(
-      (total, candidate) => total + estimateCapabilitySurfaceTokens(candidate.capability),
-      0,
-    ),
+    selectedEstimatedTokens,
+    surface,
+    receipt,
   };
 
   function scoreCapability(
@@ -262,7 +286,7 @@ function contextMatches(requiredContext: string, providedContext: string[]): boo
   });
 }
 
-function estimateCapabilitySurfaceTokens(capability: Capability): number {
+function estimateSelectedCapabilitySurfaceTokens(capability: SelectedCapability): number {
   return estimatePromptTokens([
     capability.id,
     capability.title,
@@ -272,7 +296,6 @@ function estimateCapabilitySurfaceTokens(capability: Capability): number {
     capability.permissionLevel,
     capability.riskLevel,
     ...capability.requiredContext,
-    ...capability.underlyingTools,
     ...capability.proofReturned,
     ...capability.examples,
   ]);
@@ -322,5 +345,20 @@ function toBlockedSelection(
     matchedContext: selection.matchedContext,
     missingContext: selection.missingContext,
     reasons,
+  };
+}
+
+function toSelectedCapability(capability: Capability): SelectedCapability {
+  return {
+    id: capability.id,
+    title: capability.title,
+    description: capability.description,
+    intent: capability.intent,
+    whenToUse: capability.whenToUse,
+    requiredContext: capability.requiredContext,
+    permissionLevel: capability.permissionLevel,
+    riskLevel: capability.riskLevel,
+    proofReturned: capability.proofReturned,
+    examples: capability.examples,
   };
 }

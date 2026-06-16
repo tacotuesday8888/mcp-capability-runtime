@@ -5,7 +5,7 @@ Task                     Investigate checkout 500s from the last 30 minutes
 Policy                   permission <= read, risk <= medium
 Provided context         service=checkout; timeWindow=30m; symptom=500
 
-Selected capabilities    1 of 8 (~110 prompt tokens, 5 underlying tools)
+Selected capabilities    1 of 8 (~99 prompt tokens, 5 underlying tools)
 - triage-production-incident (read/medium, score 24)
   matched: 30, checkout, investigate, last, minutes
   proof: event ids; trace id; release id; log query; chat permalink
