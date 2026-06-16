@@ -39,6 +39,8 @@ test("package config builds before packing and checks publish contents", () => {
   assert.match(packageJson.scripts["demo:select"] ?? "", /--task/);
   assert.match(packageJson.scripts["example:select"] ?? "", /select --input examples\/minimal-tool-surface\.json/);
   assert.match(packageJson.scripts["demo:walkthrough"] ?? "", /demo:walkthrough/);
+  assert.match(packageJson.scripts["demo:receipt"] ?? "", /demo:receipt/);
+  assert.match(packageJson.scripts["demo:receipt:json"] ?? "", /demo:receipt --json/);
   assert.equal(packageJson.engines.node, ">=22");
   assert.equal(packageJson.repository?.url, "git+https://github.com/tacotuesday8888/mcp-capability-runtime.git");
   assert.equal(packageJson.bugs?.url, "https://github.com/tacotuesday8888/mcp-capability-runtime/issues");
@@ -61,7 +63,7 @@ test("package entry points target built runtime files", () => {
   assert.equal(packageJson.bin["mcp-capability-runtime"], "./dist/src/cli.js");
 });
 
-test("package dry-run includes runtime planner and walkthrough artifacts", () => {
+test("package dry-run includes runtime planner and receipt artifacts", () => {
   const result = spawnSync("npm", ["--cache", "./.npm-cache", "--ignore-scripts", "pack", "--dry-run", "--json"], {
     cwd: process.cwd(),
     encoding: "utf8",
@@ -82,7 +84,12 @@ test("package dry-run includes runtime planner and walkthrough artifacts", () =>
     "README.md",
     "LICENSE",
     "docs/invocation-planner.md",
+    "docs/invocation-receipts.md",
+    "examples/demo-receipt-output.json",
+    "examples/demo-receipt-output.txt",
     "examples/demo-walkthrough-output.txt",
+    "dist/src/runtime/receipt.js",
+    "dist/src/demo/receipt.js",
     "dist/src/runtime/plan.js",
     "dist/src/demo/walkthrough.js",
   ]) {

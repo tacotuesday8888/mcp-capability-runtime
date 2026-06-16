@@ -1,6 +1,6 @@
 {
   "name": "mcp-capability-runtime",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A MCP-compatible capability runtime demo that turns flat tool lists into capability surfaces.",
   "type": "module",
   "license": "MIT",
@@ -42,6 +42,8 @@
     "demo:select": "npm run build && node dist/src/cli.js select --demo --task \"Investigate checkout 500s from the last 30 minutes\" --context service=checkout --context timeWindow=30m --context symptom=500",
     "example:select": "npm run build && node dist/src/cli.js select --input examples/minimal-tool-surface.json --task \"Investigate checkout logs\" --context service=checkout --context timeWindow=30m --context symptom=500",
     "demo:walkthrough": "npm run build && node dist/src/cli.js demo:walkthrough",
+    "demo:receipt": "npm run build && node dist/src/cli.js demo:receipt",
+    "demo:receipt:json": "npm run build && node dist/src/cli.js demo:receipt --json",
     "prepack": "npm run build",
     "pack:check": "npm --cache ./.npm-cache pack --dry-run --json"
   },

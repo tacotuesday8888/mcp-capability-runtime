@@ -107,3 +107,31 @@ The planner returns:
 - `toolsExecuted: false`
 
 The planner rejects blocked capabilities, missing capabilities, missing tools, requested tools outside the selected capability, and tools not exposed by the selection receipt. In plain English: selection decides what the agent may see; planning proves which selected raw tool routes are allowed before anything can run.
+
+## Invocation Receipt Contract
+
+The invocation receipt records local, caller-supplied results for a valid invocation plan. It still does not call real MCP tools.
+
+The receipt request includes:
+
+- a `CapabilityInvocationPlan`
+- deterministic local tool results keyed by tool ID
+- an optional source label such as `local-fixture`
+
+The receipt returns:
+
+- `mode: "capability-invocation-receipt"`
+- `valid`
+- task and capability ID
+- execution mode and source
+- planned and attempted tool IDs
+- executed route summaries
+- proof values grouped by the capability's required proof labels
+- missing proof labels
+- changed resources
+- typed issues
+- `toolsExecuted`
+
+The recorder rejects invalid plans, unplanned tool results, duplicate results, missing planned results, failed tool results, and missing required proof. It ignores unplanned proof so a caller cannot smuggle unrelated tool output into the receipt.
+
+See [invocation-receipts.md](invocation-receipts.md) for examples and the exact boundary.

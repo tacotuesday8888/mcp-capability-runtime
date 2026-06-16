@@ -3,11 +3,13 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
+  createDemoInvocationReceipt,
   computeTaxMeter,
   demoCapabilities,
   demoServers,
   loadToolSurfaceFile,
   renderCapabilitySelectionReport,
+  renderDemoReceiptReport,
   renderDemoWalkthroughReport,
   renderTaxMeterReport,
   selectCapabilities,
@@ -58,6 +60,20 @@ test("demo selector output matches the checked-in golden example", () => {
 test("demo walkthrough output matches the checked-in golden example", () => {
   const expected = readFileSync("examples/demo-walkthrough-output.txt", "utf8").trimEnd();
   const actual = renderDemoWalkthroughReport();
+
+  assert.equal(actual, expected);
+});
+
+test("demo receipt output matches the checked-in golden example", () => {
+  const expected = readFileSync("examples/demo-receipt-output.txt", "utf8").trimEnd();
+  const actual = renderDemoReceiptReport();
+
+  assert.equal(actual, expected);
+});
+
+test("demo receipt JSON output matches the checked-in golden example", () => {
+  const expected = readFileSync("examples/demo-receipt-output.json", "utf8").trimEnd();
+  const actual = JSON.stringify(createDemoInvocationReceipt(), null, 2);
 
   assert.equal(actual, expected);
 });

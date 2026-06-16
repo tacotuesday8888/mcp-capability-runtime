@@ -3,6 +3,7 @@ import { planCapabilityInvocation } from "../runtime/plan.js";
 import { computeTaxMeter } from "../tax-meter/tax-meter.js";
 import type { CapabilitySelectionReport } from "../types.js";
 import { demoCapabilities, demoServers } from "./fixture.js";
+import { createDemoInvocationReceipt } from "./receipt.js";
 
 export function renderDemoWalkthroughReport(): string {
   const tax = computeTaxMeter(demoServers, demoCapabilities);
@@ -16,6 +17,7 @@ export function renderDemoWalkthroughReport(): string {
     receipt: triage.receipt,
     capabilityId: "triage-production-incident",
   });
+  const triageReceipt = createDemoInvocationReceipt();
   const source = selectCapabilities(demoCapabilities, {
     task: "Find checkout code and open issues before preparing a code change",
     context: ["repository name", "service area", "keyword=checkout", "incident keywords"],
@@ -46,13 +48,20 @@ export function renderDemoWalkthroughReport(): string {
     `- routeable tools: ${triagePlan.allowedToolRoutes.map((route) => route.toolId).join(", ")}`,
     `- proof required: ${triagePlan.proofRequired.join("; ")}`,
     "",
-    "3. Add source and work-item context",
+    "3. Record the local proof receipt",
+    `- execution mode: ${triageReceipt.executionMode} (${triageReceipt.source})`,
+    `- tools executed: ${triageReceipt.toolsExecuted}; receipt valid=${triageReceipt.valid}`,
+    `- changed resources: ${triageReceipt.changedResources.length === 0 ? "none" : triageReceipt.changedResources.join(", ")}`,
+    `- proof returned: ${triageReceipt.proof.map((entry) => entry.label).join("; ")}`,
+    `- missing proof: ${triageReceipt.missingProof.length === 0 ? "none" : triageReceipt.missingProof.join("; ")}`,
+    "",
+    "4. Add source and work-item context",
     `- task: ${source.task}`,
     `- selected surface: ${selectedIds(source)}`,
     `- exposed tools: ${source.exposedUnderlyingTools.join(", ")}`,
     `- toolsExecuted=${source.receipt.toolsExecuted}`,
     "",
-    "4. Keep risky action blocked until permission changes",
+    "5. Keep risky action blocked until permission changes",
     `- task: ${blockedWrite.task}`,
     "- policy: permission <= read, risk <= medium",
     `- prepare-code-change: ${writeBlock?.reasons.map((reason) => reason.message).join("; ") ?? "not blocked"}`,
@@ -62,7 +71,8 @@ export function renderDemoWalkthroughReport(): string {
     "Receipt boundary",
     "- selected surfaces are task-scoped",
     "- invocation plans route only tools exposed by the selected capability receipt",
-    "- no real MCP servers, SaaS accounts, credentials, or tools were used",
+    "- local receipts record supplied fixture results and required proof",
+    "- no real MCP servers, SaaS accounts, credentials, network transports, or production tools were used",
   ].join("\n");
 }
 

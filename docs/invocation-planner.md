@@ -18,9 +18,10 @@ The walkthrough is local and deterministic. It shows:
 - the cleaned 8-capability surface
 - the selected incident-triage capability
 - the routeable tool plan for that capability
+- a local simulated receipt recorded from fixture results
 - a write capability blocked by the default read policy
 
-No real tools run.
+No real MCP tools run. The receipt step records deterministic local fixture results so the proof shape is visible without SaaS accounts, credentials, or network transports.
 
 ## Framework API
 
@@ -53,4 +54,4 @@ The planner rejects:
 - stale or invalid tool surfaces
 - missing capabilities or missing tools
 
-This is not production sandboxing. It is the smallest deterministic proof that the runtime can keep raw tool routing scoped to selected capabilities.
+This is not production sandboxing. It is the smallest deterministic proof that the runtime can keep raw tool routing scoped to selected capabilities. See [invocation-receipts.md](invocation-receipts.md) for the next local step: recording supplied fixture results against a valid plan.

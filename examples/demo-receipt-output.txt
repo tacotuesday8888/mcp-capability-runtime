@@ -1,0 +1,28 @@
+MCP Capability Runtime Local Receipt
+====================================
+
+Task                     Investigate checkout 500s from the last 30 minutes
+Capability               triage-production-incident
+Execution mode           local-simulated (local-fixture)
+Receipt valid            yes
+Tools executed           yes
+Changed resources        none
+
+Planned tool routes
+- error.searchEvents via Error Tracker/searchEvents: ok
+- error.getTrace via Error Tracker/getTrace: ok
+- deploy.searchLogs via Deployment/searchLogs: ok
+- deploy.getStatus via Deployment/getStatus: ok
+- chat.searchIncidentChannel via Chat Status/searchIncidentChannel: ok
+
+Proof returned
+- event ids: evt_checkout_500_001, evt_checkout_500_017
+- trace id: trace_checkout_9f12
+- release id: release_2026_06_16_1432
+- log query: service=checkout status=500 window=30m, service=checkout release=release_2026_06_16_1432 severity=error
+- chat permalink: https://chat.example.local/incidents/checkout-500s/p/1718541120
+
+Receipt boundary
+- records supplied local fixture results
+- rejects invalid plans, unplanned tools, duplicate results, missing results, failed results, and missing proof
+- no real MCP servers, SaaS accounts, credentials, network transports, or production tools were used

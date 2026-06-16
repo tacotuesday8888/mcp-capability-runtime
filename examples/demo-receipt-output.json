@@ -1,0 +1,149 @@
+{
+  "mode": "capability-invocation-receipt",
+  "valid": true,
+  "task": "Investigate checkout 500s from the last 30 minutes",
+  "capabilityId": "triage-production-incident",
+  "executionMode": "local-simulated",
+  "source": "local-fixture",
+  "plannedToolIds": [
+    "error.searchEvents",
+    "error.getTrace",
+    "deploy.searchLogs",
+    "deploy.getStatus",
+    "chat.searchIncidentChannel"
+  ],
+  "attemptedToolIds": [
+    "error.searchEvents",
+    "error.getTrace",
+    "deploy.searchLogs",
+    "deploy.getStatus",
+    "chat.searchIncidentChannel"
+  ],
+  "executedToolRoutes": [
+    {
+      "toolId": "error.searchEvents",
+      "toolName": "searchEvents",
+      "serverId": "error-tracker",
+      "serverTitle": "Error Tracker",
+      "category": "error tracking and logs",
+      "permissionLevel": "read",
+      "riskLevel": "medium",
+      "status": "ok",
+      "summary": "Found 17 checkout 500 events in the last 30 minutes.",
+      "proofReturned": [
+        "event ids",
+        "log query"
+      ]
+    },
+    {
+      "toolId": "error.getTrace",
+      "toolName": "getTrace",
+      "serverId": "error-tracker",
+      "serverTitle": "Error Tracker",
+      "category": "error tracking and logs",
+      "permissionLevel": "read",
+      "riskLevel": "low",
+      "status": "ok",
+      "summary": "Read the highest-volume checkout trace.",
+      "proofReturned": [
+        "trace id"
+      ]
+    },
+    {
+      "toolId": "deploy.searchLogs",
+      "toolName": "searchLogs",
+      "serverId": "deployment",
+      "serverTitle": "Deployment",
+      "category": "deployment status",
+      "permissionLevel": "read",
+      "riskLevel": "medium",
+      "status": "ok",
+      "summary": "Confirmed errors started after the current release reached production.",
+      "proofReturned": [
+        "log query"
+      ]
+    },
+    {
+      "toolId": "deploy.getStatus",
+      "toolName": "getStatus",
+      "serverId": "deployment",
+      "serverTitle": "Deployment",
+      "category": "deployment status",
+      "permissionLevel": "read",
+      "riskLevel": "low",
+      "status": "ok",
+      "summary": "Checked production deployment status for checkout.",
+      "proofReturned": [
+        "release id"
+      ]
+    },
+    {
+      "toolId": "chat.searchIncidentChannel",
+      "toolName": "searchIncidentChannel",
+      "serverId": "chat-status",
+      "serverTitle": "Chat Status",
+      "category": "chat and status update",
+      "permissionLevel": "read",
+      "riskLevel": "low",
+      "status": "ok",
+      "summary": "Found the active incident thread and linked evidence.",
+      "proofReturned": [
+        "chat permalink"
+      ]
+    }
+  ],
+  "proof": [
+    {
+      "label": "event ids",
+      "values": [
+        "evt_checkout_500_001",
+        "evt_checkout_500_017"
+      ],
+      "toolIds": [
+        "error.searchEvents"
+      ]
+    },
+    {
+      "label": "trace id",
+      "values": [
+        "trace_checkout_9f12"
+      ],
+      "toolIds": [
+        "error.getTrace"
+      ]
+    },
+    {
+      "label": "release id",
+      "values": [
+        "release_2026_06_16_1432"
+      ],
+      "toolIds": [
+        "deploy.getStatus"
+      ]
+    },
+    {
+      "label": "log query",
+      "values": [
+        "service=checkout status=500 window=30m",
+        "service=checkout release=release_2026_06_16_1432 severity=error"
+      ],
+      "toolIds": [
+        "error.searchEvents",
+        "deploy.searchLogs"
+      ]
+    },
+    {
+      "label": "chat permalink",
+      "values": [
+        "https://chat.example.local/incidents/checkout-500s/p/1718541120"
+      ],
+      "toolIds": [
+        "chat.searchIncidentChannel"
+      ]
+    }
+  ],
+  "missingProof": [],
+  "changedResources": [],
+  "issues": [],
+  "toolsExecuted": true
+}

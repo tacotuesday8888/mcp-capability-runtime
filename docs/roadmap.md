@@ -70,8 +70,9 @@ Still out of scope for v0.4:
 
 ## v0.7: Local Receipts And Proof
 
-- Turn dry-run selection receipts into execution receipts once local fake tool execution exists.
+- Record local simulated invocation receipts from deterministic fixture results.
 - Show what the agent saw, selected, attempted, changed, and proved.
+- Reject invalid plans, unplanned tool results, duplicate results, missing results, failed results, and missing proof.
 - Keep the first executable receipt local and deterministic.
 
 ## v0.8: Read-Only MCP Discovery

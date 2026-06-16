@@ -14,6 +14,8 @@ Requires Node.js 22 or newer.
 npm install
 npm test
 npm run demo:walkthrough
+npm run demo:receipt
+npm run demo:receipt:json
 npm run demo:tax
 npm run demo:select
 npm run example:tax
@@ -22,7 +24,7 @@ npm run raw:tax
 npm run pack:check
 ```
 
-The walkthrough, selector, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real tool execution.
+The walkthrough, selector, receipt demo, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real production tool execution.
 
 ## What The Demo Shows
 
@@ -47,7 +49,7 @@ Run the one-command walkthrough first if you want the staged story:
 npm run demo:walkthrough
 ```
 
-It shows the raw 40-tool tax, the cleaned 8-capability surface, the selected incident-triage capability, the allowed local invocation plan, and a blocked write action. It still does not execute real tools.
+It shows the raw 40-tool tax, the cleaned 8-capability surface, the selected incident-triage capability, the allowed local invocation plan, a deterministic local proof receipt, and a blocked write action. The receipt records fake local fixture results only; it does not execute real MCP tools.
 
 ## Example Output
 
@@ -156,6 +158,39 @@ console.log(plan.toolsExecuted); // false
 
 The planner rejects blocked capabilities, stale receipts, missing tools, and tool IDs outside the selected capability. It is still a local guardrail and routing plan, not production sandboxing and not real MCP execution.
 
+## Local Invocation Receipts
+
+Invocation planning says which routes are allowed. Local receipt recording says what supplied fixture results proved.
+
+```bash
+npm run demo:receipt
+npm run demo:receipt:json
+```
+
+The v0.7 receipt demo records deterministic fake results for `triage-production-incident`. It returns the planned tool IDs, attempted tool IDs, per-tool result summaries, required proof values, missing proof, changed resources, typed issues, and `toolsExecuted: true`.
+
+```ts
+import {
+  createDemoInvocationReceipt,
+  recordCapabilityInvocation,
+  demoInvocationToolResults,
+} from "mcp-capability-runtime";
+
+const demoReceipt = createDemoInvocationReceipt();
+console.log(demoReceipt.proof.map((entry) => entry.label));
+
+// Use the CapabilityInvocationPlan from the planning step above.
+const receipt = recordCapabilityInvocation({
+  plan,
+  source: "local-fixture",
+  results: demoInvocationToolResults,
+});
+```
+
+`recordCapabilityInvocation` is pure. It validates caller-supplied local results against a valid invocation plan. It rejects invalid plans, unplanned tool results, duplicate tool results, missing planned tool results, failed tool results, and missing required proof. It does not call tools, open network transports, authenticate to SaaS, or sandbox production actions.
+
+See [docs/invocation-receipts.md](docs/invocation-receipts.md) for the receipt contract and failure behavior.
+
 ## External JSON Input
 
 You can run the tax meter against a static, read-only MCP-like tool surface with a proposed capability surface:
@@ -181,6 +216,7 @@ See [docs/external-input.md](docs/external-input.md) for the format and how this
 
 ```ts
 import {
+  createDemoInvocationReceipt,
   computeTaxMeter,
   demoCapabilities,
   demoServers,
@@ -198,14 +234,14 @@ const selected = selectCapabilities(demoCapabilities, {
 console.log(renderTaxMeterReport(report));
 console.log(selected.surface.capabilities.map((capability) => capability.id));
 console.log(selected.receipt.selectedCapabilityIds);
-console.log(
-  planCapabilityInvocation({
-    servers: demoServers,
-    capabilities: demoCapabilities,
-    receipt: selected.receipt,
-    capabilityId: "triage-production-incident",
-  }).allowedToolRoutes,
-);
+const plan = planCapabilityInvocation({
+  servers: demoServers,
+  capabilities: demoCapabilities,
+  receipt: selected.receipt,
+  capabilityId: "triage-production-incident",
+});
+console.log(plan.allowedToolRoutes);
+console.log(createDemoInvocationReceipt().proof);
 ```
 
 Public exports include:
@@ -216,6 +252,7 @@ Public exports include:
 - semantic capability surface audit
 - task-scoped capability selection with separate surface and receipt outputs
 - capability invocation planning
+- local simulated invocation receipt recording
 - staged local walkthrough renderer
 - prompt token estimation
 - tax-meter calculation
@@ -226,7 +263,7 @@ Public exports include:
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. V0.6 adds a local invocation planner so selected capabilities can be converted into routeable tool plans without executing anything. Future versions can add local fake execution receipts and then a real read-only MCP discovery adapter.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. V0.6 adds a local invocation planner so selected capabilities can be converted into routeable tool plans without executing anything. V0.7 records local simulated invocation receipts from deterministic fixture results. Future versions can add read-only MCP discovery and then the fake incident-to-PR runner.
 
 ## V1 Scope
 
@@ -248,6 +285,7 @@ This first slice includes:
 - task-scoped selector with dry-run receipt
 - separate selected surface and developer receipt outputs
 - capability invocation planner
+- local simulated invocation receipts
 - one-command staged demo walkthrough
 
 ## Out Of Scope For V1
@@ -265,7 +303,7 @@ This repo intentionally does not yet include:
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) for the next milestones: local fake execution receipts/proof, read-only MCP discovery, the incident-to-PR runner, and naming research.
+See [docs/roadmap.md](docs/roadmap.md) for the next milestones: read-only MCP discovery, the incident-to-PR runner, and naming research.
 
 ## Long-Term Direction
 

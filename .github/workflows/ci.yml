@@ -60,5 +60,11 @@ jobs:
       - name: Demo walkthrough
         run: npm run demo:walkthrough
 
+      - name: Demo local receipt
+        run: npm run demo:receipt
+
+      - name: Demo local receipt JSON
+        run: npm run demo:receipt:json
+
       - name: Package dry-run
         run: npm run pack:check

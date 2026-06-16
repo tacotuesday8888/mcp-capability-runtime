@@ -16,13 +16,20 @@ Story                    10 MCP-like servers, one production incident, staged ca
 - routeable tools: error.searchEvents, error.getTrace, deploy.searchLogs, deploy.getStatus, chat.searchIncidentChannel
 - proof required: event ids; trace id; release id; log query; chat permalink
 
-3. Add source and work-item context
+3. Record the local proof receipt
+- execution mode: local-simulated (local-fixture)
+- tools executed: true; receipt valid=true
+- changed resources: none
+- proof returned: event ids; trace id; release id; log query; chat permalink
+- missing proof: none
+
+4. Add source and work-item context
 - task: Find checkout code and open issues before preparing a code change
 - selected surface: inspect-source-context, inspect-work-items
 - exposed tools: docs.getPage, docs.searchPages, docs.summarizeRunbook, issue.searchIssues, pr.searchPullRequests, repo.getFile, repo.searchCode
 - toolsExecuted=false
 
-4. Keep risky action blocked until permission changes
+5. Keep risky action blocked until permission changes
 - task: Prepare checkout code change and open pull request
 - policy: permission <= read, risk <= medium
 - prepare-code-change: write permission exceeds request ceiling read
@@ -32,4 +39,5 @@ Story                    10 MCP-like servers, one production incident, staged ca
 Receipt boundary
 - selected surfaces are task-scoped
 - invocation plans route only tools exposed by the selected capability receipt
-- no real MCP servers, SaaS accounts, credentials, or tools were used
+- local receipts record supplied fixture results and required proof
+- no real MCP servers, SaaS accounts, credentials, network transports, or production tools were used

@@ -240,3 +240,75 @@ export interface CapabilityInvocationPlan {
   issues: CapabilityInvocationPlanIssue[];
   toolsExecuted: false;
 }
+
+export type CapabilityInvocationResultStatus = "ok" | "error";
+
+export type CapabilityProofValue = string | string[];
+
+export interface CapabilityInvocationToolResult {
+  toolId: string;
+  status: CapabilityInvocationResultStatus;
+  summary: string;
+  proof?: Record<string, CapabilityProofValue>;
+  changedResources?: string[];
+  errorMessage?: string;
+}
+
+export type CapabilityInvocationReceiptSource = "caller-supplied" | "local-fixture";
+
+export type CapabilityInvocationReceiptIssueCode =
+  | "invalid-invocation-plan"
+  | "unplanned-tool-result"
+  | "duplicate-tool-result"
+  | "missing-tool-result"
+  | "tool-execution-failed"
+  | "missing-required-proof";
+
+export interface CapabilityInvocationReceiptIssue {
+  code: CapabilityInvocationReceiptIssueCode;
+  path: string;
+  message: string;
+}
+
+export interface CapabilityProofEntry {
+  label: string;
+  values: string[];
+  toolIds: string[];
+}
+
+export interface CapabilityToolExecution {
+  toolId: string;
+  toolName: string;
+  serverId: string;
+  serverTitle: string;
+  category: string;
+  permissionLevel: PermissionLevel;
+  riskLevel: RiskLevel;
+  status: CapabilityInvocationResultStatus | "missing";
+  summary: string;
+  proofReturned: string[];
+  errorMessage?: string;
+}
+
+export interface CapabilityInvocationReceiptRequest {
+  plan: CapabilityInvocationPlan;
+  results: CapabilityInvocationToolResult[];
+  source?: CapabilityInvocationReceiptSource;
+}
+
+export interface CapabilityInvocationReceipt {
+  mode: "capability-invocation-receipt";
+  valid: boolean;
+  task: string;
+  capabilityId: string;
+  executionMode: "local-simulated";
+  source: CapabilityInvocationReceiptSource;
+  plannedToolIds: string[];
+  attemptedToolIds: string[];
+  executedToolRoutes: CapabilityToolExecution[];
+  proof: CapabilityProofEntry[];
+  missingProof: string[];
+  changedResources: string[];
+  issues: CapabilityInvocationReceiptIssue[];
+  toolsExecuted: boolean;
+}

@@ -8,7 +8,9 @@ import {
   isPermissionLevel,
   isRiskLevel,
   loadToolSurfaceFile,
+  createDemoInvocationReceipt,
   renderCapabilitySelectionReport,
+  renderDemoReceiptReport,
   renderDemoWalkthroughReport,
   renderTaxMeterReport,
   selectCapabilities,
@@ -24,6 +26,8 @@ function printHelp(): void {
       "  select     Select a task-scoped capability surface and print a dry-run selection report.",
       "  demo:walkthrough",
       "             Show the staged local demo from raw tools to planned capability routes.",
+      "  demo:receipt",
+      "             Show a deterministic local fixture receipt for the incident-triage capability.",
       "  demo:tax   Alias for tax --demo.",
       "",
       "Tax options:",
@@ -37,6 +41,9 @@ function printHelp(): void {
       "  --max-risk <level>         low, medium, or high. Defaults to medium.",
       "  --limit <count>            Maximum selected capabilities. Defaults to 5.",
       "  --json                     Print a stable JSON selection report.",
+      "",
+      "Receipt options:",
+      "  --json                     Print a stable JSON local receipt.",
       "  -h, --help       Show this help.",
     ].join("\n"),
   );
@@ -47,6 +54,7 @@ type SurfaceOptions = { mode: "demo" } | { mode: "input"; inputFile: string };
 type CliOptions =
   | ({ command: "tax" } & SurfaceOptions)
   | { command: "demo:walkthrough" }
+  | { command: "demo:receipt"; json: boolean }
   | ({
       command: "select";
       task: string;
@@ -80,6 +88,10 @@ function parseArgs(argv: string[]): CliOptions | "help" {
     return { command: "demo:walkthrough" };
   }
 
+  if (command === "demo:receipt") {
+    return parseDemoReceiptArgs(rest);
+  }
+
   if (command === "select") {
     return parseSelectArgs(rest);
   }
@@ -89,6 +101,21 @@ function parseArgs(argv: string[]): CliOptions | "help" {
   }
 
   return { command: "tax", ...parseSurfaceArgs(rest) };
+}
+
+function parseDemoReceiptArgs(rest: string[]): CliOptions {
+  let json = false;
+
+  for (const arg of rest) {
+    if (arg === "--json") {
+      json = true;
+      continue;
+    }
+
+    throw new ToolSurfaceValidationError([`unknown option for demo:receipt: ${arg}`]);
+  }
+
+  return { command: "demo:receipt", json };
 }
 
 function parseSurfaceArgs(rest: string[]): SurfaceOptions {
@@ -258,6 +285,11 @@ function run(argv: string[]): number {
 
     if (options.command === "demo:walkthrough") {
       console.log(renderDemoWalkthroughReport());
+      return 0;
+    }
+
+    if (options.command === "demo:receipt") {
+      console.log(options.json ? JSON.stringify(createDemoInvocationReceipt(), null, 2) : renderDemoReceiptReport());
       return 0;
     }
 
