@@ -60,19 +60,27 @@ Still out of scope for v0.4:
 - Keep receipts deterministic and local, with selected IDs, selected decision details, blocked reasons, exposed selected tools, token estimate, and `toolsExecuted: false`.
 - Add launch checks for checked-in demo output and external selector input.
 
-## v0.6: Receipts And Proof
+## v0.6: Invocation Planning And Walkthrough
+
+- Turn selection receipts into local invocation plans for one selected capability.
+- Prove which selected raw tool routes are allowed before anything executes.
+- Reject blocked capabilities, stale receipts, missing tools, and tools outside the selected capability.
+- Add a one-command walkthrough that shows raw tools, selected capabilities, planned routes, and blocked write action.
+- Keep `toolsExecuted: false`.
+
+## v0.7: Local Receipts And Proof
 
 - Turn dry-run selection receipts into execution receipts once local fake tool execution exists.
 - Show what the agent saw, selected, attempted, changed, and proved.
 - Keep the first executable receipt local and deterministic.
 
-## v0.7: Read-Only MCP Discovery
+## v0.8: Read-Only MCP Discovery
 
 - Inspect configured MCP servers without executing their tools.
 - Produce the same raw tool-surface shape used by the JSON path.
 - Keep authentication, OAuth, and production-grade transport hardening out of scope until the adapter contract is clear.
 
-## v0.8: Incident-To-PR Runner
+## v0.9: Incident-To-PR Runner
 
 - Build the flagship demo path: 10 MCP servers, one production incident, one clean PR.
 - Use fake local developer tools first.

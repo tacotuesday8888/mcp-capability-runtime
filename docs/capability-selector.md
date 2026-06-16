@@ -72,6 +72,8 @@ node dist/src/cli.js select --demo \
 
 The JSON selection report is deterministic and local. It is not a runtime proof trail yet; it includes the first selection receipt that shows what the runtime would expose before any tool execution exists.
 
+That receipt can now feed `planCapabilityInvocation`, which builds a local invocation plan for one selected capability. The planner checks that a capability was selected and that every requested tool belongs to that selected capability and was exposed by the receipt. It still returns `toolsExecuted: false`.
+
 ## Scope
 
 This selector does not call an LLM, execute tools, connect to real MCP transports, or authenticate to SaaS services. It uses deterministic keyword and context matching so the behavior is easy to inspect and test.

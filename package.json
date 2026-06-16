@@ -1,10 +1,18 @@
 {
   "name": "mcp-capability-runtime",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A MCP-compatible capability runtime demo that turns flat tool lists into capability surfaces.",
   "type": "module",
   "license": "MIT",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tacotuesday8888/mcp-capability-runtime.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tacotuesday8888/mcp-capability-runtime/issues"
+  },
+  "homepage": "https://github.com/tacotuesday8888/mcp-capability-runtime#readme",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
   "exports": {
@@ -33,6 +41,7 @@
     "raw:tax": "npm run build && node dist/src/cli.js tax --input examples/raw-tool-surface.json",
     "demo:select": "npm run build && node dist/src/cli.js select --demo --task \"Investigate checkout 500s from the last 30 minutes\" --context service=checkout --context timeWindow=30m --context symptom=500",
     "example:select": "npm run build && node dist/src/cli.js select --input examples/minimal-tool-surface.json --task \"Investigate checkout logs\" --context service=checkout --context timeWindow=30m --context symptom=500",
+    "demo:walkthrough": "npm run build && node dist/src/cli.js demo:walkthrough",
     "prepack": "npm run build",
     "pack:check": "npm --cache ./.npm-cache pack --dry-run --json"
   },

@@ -1,0 +1,35 @@
+MCP Capability Runtime Walkthrough
+==================================
+
+Story                    10 MCP-like servers, one production incident, staged capability exposure
+
+1. Measure the MCP tax
+- raw tools: 40 (~1734 prompt tokens)
+- capabilities: 8 (~808 prompt tokens)
+- reductions: 80% fewer entries, 53% fewer tokens, 89% fewer risky entries
+
+2. Select the first safe incident capability
+- task: Investigate checkout 500s from the last 30 minutes
+- selected surface: triage-production-incident
+- agent-facing surface: 1 capability (~99 prompt tokens)
+- invocation plan: 5 routeable tools; toolsExecuted=false
+- routeable tools: error.searchEvents, error.getTrace, deploy.searchLogs, deploy.getStatus, chat.searchIncidentChannel
+- proof required: event ids; trace id; release id; log query; chat permalink
+
+3. Add source and work-item context
+- task: Find checkout code and open issues before preparing a code change
+- selected surface: inspect-source-context, inspect-work-items
+- exposed tools: docs.getPage, docs.searchPages, docs.summarizeRunbook, issue.searchIssues, pr.searchPullRequests, repo.getFile, repo.searchCode
+- toolsExecuted=false
+
+4. Keep risky action blocked until permission changes
+- task: Prepare checkout code change and open pull request
+- policy: permission <= read, risk <= medium
+- prepare-code-change: write permission exceeds request ceiling read
+- selected surface: none
+- toolsExecuted=false
+
+Receipt boundary
+- selected surfaces are task-scoped
+- invocation plans route only tools exposed by the selected capability receipt
+- no real MCP servers, SaaS accounts, credentials, or tools were used

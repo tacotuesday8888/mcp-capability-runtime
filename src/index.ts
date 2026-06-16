@@ -10,13 +10,20 @@ export {
 } from "./capabilities/policy.js";
 export { renderCapabilitySelectionReport, selectCapabilities } from "./capabilities/select.js";
 export { demoCapabilities, demoServers } from "./demo/fixture.js";
+export { renderDemoWalkthroughReport } from "./demo/walkthrough.js";
 export { loadToolSurfaceFile, parseToolSurfaceInput, ToolSurfaceValidationError } from "./input/json.js";
+export { planCapabilityInvocation } from "./runtime/plan.js";
 export { estimatePromptTokens } from "./tax-meter/estimate.js";
 export { computeTaxMeter, flattenTools } from "./tax-meter/tax-meter.js";
 export { renderTaxMeterReport } from "./tax-meter/report.js";
 export type { ToolSurfaceInput } from "./input/json.js";
 export type {
   Capability,
+  CapabilityInvocationPlan,
+  CapabilityInvocationPlanIssue,
+  CapabilityInvocationPlanIssueCode,
+  CapabilityInvocationPlanRequest,
+  CapabilityToolRoute,
   DuplicateToolGroup,
   McpLikeServer,
   PermissionLevel,

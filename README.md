@@ -13,6 +13,7 @@ Requires Node.js 22 or newer.
 ```bash
 npm install
 npm test
+npm run demo:walkthrough
 npm run demo:tax
 npm run demo:select
 npm run example:tax
@@ -21,7 +22,7 @@ npm run raw:tax
 npm run pack:check
 ```
 
-The demo, selector, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real tool execution.
+The walkthrough, selector, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real tool execution.
 
 ## What The Demo Shows
 
@@ -39,6 +40,14 @@ The local fixture imitates 10 developer-tool servers:
 - pull request output
 
 The raw surface exposes 40 fake MCP-like tools, including duplicate search tools, noisy inventory tools, and high-risk admin actions. The cleaned surface exposes 8 capabilities that describe what the agent should do, when to use it, what context it needs, what permission level it needs, and what proof it should return.
+
+Run the one-command walkthrough first if you want the staged story:
+
+```bash
+npm run demo:walkthrough
+```
+
+It shows the raw 40-tool tax, the cleaned 8-capability surface, the selected incident-triage capability, the allowed local invocation plan, and a blocked write action. It still does not execute real tools.
 
 ## Example Output
 
@@ -117,6 +126,36 @@ By default, selection is conservative: permission is capped at `read`, risk is c
 
 See [docs/capability-selector.md](docs/capability-selector.md) for selector options and JSON selection report output.
 
+## Invocation Planning
+
+Selection says what the agent should see. Invocation planning says which selected tools are routeable for one selected capability.
+
+```ts
+import {
+  demoCapabilities,
+  demoServers,
+  planCapabilityInvocation,
+  selectCapabilities,
+} from "mcp-capability-runtime";
+
+const selected = selectCapabilities(demoCapabilities, {
+  task: "Investigate checkout 500s",
+  context: ["service=checkout", "timeWindow=30m", "symptom=500"],
+});
+
+const plan = planCapabilityInvocation({
+  servers: demoServers,
+  capabilities: demoCapabilities,
+  receipt: selected.receipt,
+  capabilityId: "triage-production-incident",
+});
+
+console.log(plan.allowedToolRoutes.map((route) => route.toolId));
+console.log(plan.toolsExecuted); // false
+```
+
+The planner rejects blocked capabilities, stale receipts, missing tools, and tool IDs outside the selected capability. It is still a local guardrail and routing plan, not production sandboxing and not real MCP execution.
+
 ## External JSON Input
 
 You can run the tax meter against a static, read-only MCP-like tool surface with a proposed capability surface:
@@ -145,6 +184,7 @@ import {
   computeTaxMeter,
   demoCapabilities,
   demoServers,
+  planCapabilityInvocation,
   renderTaxMeterReport,
   selectCapabilities,
 } from "mcp-capability-runtime";
@@ -158,6 +198,14 @@ const selected = selectCapabilities(demoCapabilities, {
 console.log(renderTaxMeterReport(report));
 console.log(selected.surface.capabilities.map((capability) => capability.id));
 console.log(selected.receipt.selectedCapabilityIds);
+console.log(
+  planCapabilityInvocation({
+    servers: demoServers,
+    capabilities: demoCapabilities,
+    receipt: selected.receipt,
+    capabilityId: "triage-production-incident",
+  }).allowedToolRoutes,
+);
 ```
 
 Public exports include:
@@ -167,6 +215,8 @@ Public exports include:
 - the cleaned capability surface
 - semantic capability surface audit
 - task-scoped capability selection with separate surface and receipt outputs
+- capability invocation planning
+- staged local walkthrough renderer
 - prompt token estimation
 - tax-meter calculation
 - text report rendering
@@ -176,7 +226,7 @@ Public exports include:
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. Future versions can add a real read-only MCP discovery adapter that reads tool metadata from existing MCP servers and then presents a capability surface to agents.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 added task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. V0.5 separates the selected agent-facing surface from the developer-facing receipt. V0.6 adds a local invocation planner so selected capabilities can be converted into routeable tool plans without executing anything. Future versions can add local fake execution receipts and then a real read-only MCP discovery adapter.
 
 ## V1 Scope
 
@@ -197,6 +247,8 @@ This first slice includes:
 - package dry-run check
 - task-scoped selector with dry-run receipt
 - separate selected surface and developer receipt outputs
+- capability invocation planner
+- one-command staged demo walkthrough
 
 ## Out Of Scope For V1
 
@@ -213,7 +265,7 @@ This repo intentionally does not yet include:
 
 ## Roadmap
 
-See [docs/roadmap.md](docs/roadmap.md) for the next milestones: executable receipts/proof, read-only MCP discovery, the incident-to-PR runner, and naming research.
+See [docs/roadmap.md](docs/roadmap.md) for the next milestones: local fake execution receipts/proof, read-only MCP discovery, the incident-to-PR runner, and naming research.
 
 ## Long-Term Direction
 

@@ -82,3 +82,28 @@ The selector also returns a developer-facing `receipt` with:
 - `toolsExecuted: false`
 
 The default permission ceiling is `read`, and the default risk ceiling is `medium`. That keeps the first selector conservative: write, execute, admin, and high-risk capabilities must be explicitly allowed before they can appear in the selected surface.
+
+## Invocation Plan Contract
+
+The invocation planner turns a selection receipt into a local routing plan for one selected capability. It does not execute tools.
+
+The planner request includes:
+
+- raw MCP-like servers
+- capability definitions
+- a selection receipt
+- the selected capability ID to invoke
+- optional requested tool IDs
+
+The planner returns:
+
+- `mode: "capability-invocation-plan"`
+- `valid`
+- task and capability ID
+- requested tool IDs
+- allowed tool routes with tool ID, server ID, server title, permission, and risk
+- required proof for the selected capability
+- typed issues when a plan is rejected
+- `toolsExecuted: false`
+
+The planner rejects blocked capabilities, missing capabilities, missing tools, requested tools outside the selected capability, and tools not exposed by the selection receipt. In plain English: selection decides what the agent may see; planning proves which selected raw tool routes are allowed before anything can run.

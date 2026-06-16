@@ -191,3 +191,52 @@ export interface CapabilitySelectionReport {
   surface: SelectedCapabilitySurface;
   receipt: CapabilitySelectionReceipt;
 }
+
+export type CapabilityInvocationPlanIssueCode =
+  | "invalid-tool-surface"
+  | "capability-not-found"
+  | "capability-not-selected"
+  | "receipt-missing-selected-detail"
+  | "receipt-policy-mismatch"
+  | "receipt-risk-mismatch"
+  | "receipt-context-mismatch"
+  | "empty-tool-request"
+  | "tool-not-found"
+  | "tool-not-in-capability"
+  | "tool-not-exposed";
+
+export interface CapabilityInvocationPlanIssue {
+  code: CapabilityInvocationPlanIssueCode;
+  path: string;
+  message: string;
+}
+
+export interface CapabilityToolRoute {
+  toolId: string;
+  toolName: string;
+  serverId: string;
+  serverTitle: string;
+  category: string;
+  permissionLevel: PermissionLevel;
+  riskLevel: RiskLevel;
+}
+
+export interface CapabilityInvocationPlanRequest {
+  servers: McpLikeServer[];
+  capabilities: Capability[];
+  receipt: CapabilitySelectionReceipt;
+  capabilityId: string;
+  requestedToolIds?: string[];
+}
+
+export interface CapabilityInvocationPlan {
+  mode: "capability-invocation-plan";
+  valid: boolean;
+  task: string;
+  capabilityId: string;
+  requestedToolIds: string[];
+  allowedToolRoutes: CapabilityToolRoute[];
+  proofRequired: string[];
+  issues: CapabilityInvocationPlanIssue[];
+  toolsExecuted: false;
+}

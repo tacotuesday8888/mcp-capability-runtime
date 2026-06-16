@@ -66,7 +66,7 @@ The audit rejects duplicate IDs, missing `underlyingTools`, empty required capab
 
 ## Package Check
 
-`npm run pack:check` runs `npm pack --dry-run --json`. It shows what would be included in the npm package without publishing anything.
+`npm run pack:check` runs `npm --cache ./.npm-cache pack --dry-run --json`. It shows what would be included in the npm package without publishing anything.
 
 ## Next Step: Selection
 

@@ -9,6 +9,7 @@ import {
   isRiskLevel,
   loadToolSurfaceFile,
   renderCapabilitySelectionReport,
+  renderDemoWalkthroughReport,
   renderTaxMeterReport,
   selectCapabilities,
 } from "./index.js";
@@ -21,6 +22,8 @@ function printHelp(): void {
       "Commands:",
       "  tax        Run the tax meter. Defaults to the built-in demo fixture.",
       "  select     Select a task-scoped capability surface and print a dry-run selection report.",
+      "  demo:walkthrough",
+      "             Show the staged local demo from raw tools to planned capability routes.",
       "  demo:tax   Alias for tax --demo.",
       "",
       "Tax options:",
@@ -43,6 +46,7 @@ type SurfaceOptions = { mode: "demo" } | { mode: "input"; inputFile: string };
 
 type CliOptions =
   | ({ command: "tax" } & SurfaceOptions)
+  | { command: "demo:walkthrough" }
   | ({
       command: "select";
       task: string;
@@ -66,6 +70,14 @@ function parseArgs(argv: string[]): CliOptions | "help" {
     }
 
     return { command: "tax", mode: "demo" };
+  }
+
+  if (command === "demo:walkthrough") {
+    if (rest.length > 0) {
+      throw new ToolSurfaceValidationError(["demo:walkthrough does not accept extra arguments"]);
+    }
+
+    return { command: "demo:walkthrough" };
   }
 
   if (command === "select") {
@@ -241,6 +253,11 @@ function run(argv: string[]): number {
 
     if (options === "help") {
       printHelp();
+      return 0;
+    }
+
+    if (options.command === "demo:walkthrough") {
+      console.log(renderDemoWalkthroughReport());
       return 0;
     }
 

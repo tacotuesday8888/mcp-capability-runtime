@@ -8,6 +8,7 @@ import {
   demoServers,
   loadToolSurfaceFile,
   renderCapabilitySelectionReport,
+  renderDemoWalkthroughReport,
   renderTaxMeterReport,
   selectCapabilities,
 } from "../src/index.js";
@@ -50,6 +51,13 @@ test("demo selector output matches the checked-in golden example", () => {
       context: ["service=checkout", "timeWindow=30m", "symptom=500"],
     }),
   );
+
+  assert.equal(actual, expected);
+});
+
+test("demo walkthrough output matches the checked-in golden example", () => {
+  const expected = readFileSync("examples/demo-walkthrough-output.txt", "utf8").trimEnd();
+  const actual = renderDemoWalkthroughReport();
 
   assert.equal(actual, expected);
 });
