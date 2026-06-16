@@ -1,10 +1,8 @@
 import { readFileSync } from "node:fs";
 
 import { auditToolSurface } from "../capabilities/audit.js";
+import { isPermissionLevel, isRiskLevel } from "../capabilities/policy.js";
 import type { Capability, McpLikeServer, PermissionLevel, RawTool, RiskLevel } from "../types.js";
-
-const permissionLevels = new Set<PermissionLevel>(["read", "write", "execute", "admin"]);
-const riskLevels = new Set<RiskLevel>(["low", "medium", "high"]);
 
 type JsonRecord = Record<string, unknown>;
 
@@ -263,8 +261,8 @@ function readOptionalBoolean(record: JsonRecord, key: string, issues: string[], 
 }
 
 function readPermissionLevel(value: unknown, path: string, issues: string[]): PermissionLevel {
-  if (typeof value === "string" && permissionLevels.has(value as PermissionLevel)) {
-    return value as PermissionLevel;
+  if (typeof value === "string" && isPermissionLevel(value)) {
+    return value;
   }
 
   issues.push(`${path} must be one of: read, write, execute, admin`);
@@ -272,8 +270,8 @@ function readPermissionLevel(value: unknown, path: string, issues: string[]): Pe
 }
 
 function readRiskLevel(value: unknown, path: string, issues: string[]): RiskLevel {
-  if (typeof value === "string" && riskLevels.has(value as RiskLevel)) {
-    return value as RiskLevel;
+  if (typeof value === "string" && isRiskLevel(value)) {
+    return value;
   }
 
   issues.push(`${path} must be one of: low, medium, high`);

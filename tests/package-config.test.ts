@@ -21,6 +21,8 @@ test("package config builds before packing and checks publish contents", () => {
 
   assert.equal(packageJson.scripts.prepack, "npm run build");
   assert.equal(packageJson.scripts["pack:check"], "npm --cache ./.npm-cache pack --dry-run --json");
+  assert.match(packageJson.scripts["demo:select"] ?? "", /select --demo/);
+  assert.match(packageJson.scripts["demo:select"] ?? "", /--task/);
   assert.equal(packageJson.engines.node, ">=22");
 });
 

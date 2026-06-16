@@ -51,5 +51,8 @@ jobs:
       - name: Raw JSON tax meter
         run: npm run raw:tax
 
+      - name: Demo capability selector
+        run: npm run demo:select
+
       - name: Package dry-run
         run: npm run pack:check

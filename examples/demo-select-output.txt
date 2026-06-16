@@ -1,0 +1,25 @@
+MCP Capability Runtime Selector
+===============================
+
+Task                     Investigate checkout 500s from the last 30 minutes
+Policy                   permission <= read, risk <= medium
+Provided context         service=checkout; timeWindow=30m; symptom=500
+
+Selected capabilities    1 of 8 (~110 prompt tokens, 5 underlying tools)
+- triage-production-incident (read/medium, score 24)
+  matched: 30, checkout, investigate, last, minutes
+  proof: event ids; trace id; release id; log query; chat permalink
+
+Blocked capabilities
+- inspect-work-items: missing required context: incident keywords, repository name
+- coordinate-status-update: write permission exceeds request ceiling read; missing required context: incident channel, current impact, next action, evidence links
+- validate-browser-behavior: execute permission exceeds request ceiling read; missing required context: URL, viewport, expected assertion
+- inspect-source-context: missing required context: repository name, service area, keyword or stack frame; no task terms matched this capability
+- query-runtime-state: missing required context: approved read-only query, row limit, package name when relevant; no task terms matched this capability
+- prepare-code-change: write permission exceeds request ceiling read; missing required context: branch name, file paths, patch summary, linked issue; no task terms matched this capability
+- merge-reviewed-pull-request: admin permission exceeds request ceiling read; high risk exceeds request ceiling medium; missing required context: pull request id, green check summary, approval record; no task terms matched this capability
+
+Dry-run receipt
+- selected ids: triage-production-incident
+- exposed tools: chat.searchIncidentChannel, deploy.getStatus, deploy.searchLogs, error.getTrace, error.searchEvents
+- no tools were executed

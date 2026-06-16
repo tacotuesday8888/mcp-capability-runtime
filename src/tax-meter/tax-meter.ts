@@ -1,12 +1,9 @@
 import type { Capability, DuplicateToolGroup, McpLikeServer, RawTool, TaxMeterReport } from "../types.js";
+import { isRisky } from "../capabilities/policy.js";
 import { estimatePromptTokens } from "./estimate.js";
 
 export function flattenTools(servers: McpLikeServer[]): RawTool[] {
   return servers.flatMap((server) => server.tools);
-}
-
-export function isRisky(permissionLevel: string, riskLevel: string): boolean {
-  return permissionLevel === "admin" || riskLevel === "high";
 }
 
 export function computeTaxMeter(servers: McpLikeServer[], capabilities?: Capability[]): TaxMeterReport {

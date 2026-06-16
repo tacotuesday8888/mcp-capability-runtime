@@ -55,6 +55,21 @@ Each capability follows the public capability contract in [capability-contract.m
 See [minimal-tool-surface.json](../examples/minimal-tool-surface.json) for a complete example.
 See [raw-tool-surface.json](../examples/raw-tool-surface.json) for a raw-only example with no `capabilities` array.
 
+## Use With Selection
+
+When an input file includes capabilities, it can also drive the task-scoped selector:
+
+```bash
+npm run build
+node dist/src/cli.js select --input examples/minimal-tool-surface.json \
+  --task "Investigate checkout logs" \
+  --context service=checkout \
+  --context timeWindow=30m \
+  --context symptom=500
+```
+
+Raw-only input is accepted by the tax meter but not by `select`, because selection needs capabilities to choose from.
+
 ## Raw-Only Mode
 
 Capabilities are optional because a developer may want to measure the current tool-list tax before designing a cleaned surface.

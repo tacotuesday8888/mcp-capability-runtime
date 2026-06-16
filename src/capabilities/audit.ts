@@ -6,19 +6,7 @@ import type {
   ToolSurfaceAuditIssue,
   ToolSurfaceAuditReport,
 } from "../types.js";
-
-const permissionRank: Record<PermissionLevel, number> = {
-  read: 0,
-  write: 1,
-  execute: 2,
-  admin: 3,
-};
-
-const riskRank: Record<RiskLevel, number> = {
-  low: 0,
-  medium: 1,
-  high: 2,
-};
+import { comparePermissionLevels, compareRiskLevels } from "./policy.js";
 
 export function auditToolSurface(servers: McpLikeServer[], capabilities: Capability[] = []): ToolSurfaceAuditReport {
   const issues: ToolSurfaceAuditIssue[] = [];
@@ -94,14 +82,17 @@ function auditUnderlyingTools(
     }
 
     highestPermission =
-      highestPermission === undefined || permissionRank[tool.permissionLevel] > permissionRank[highestPermission]
+      highestPermission === undefined || comparePermissionLevels(tool.permissionLevel, highestPermission) > 0
         ? tool.permissionLevel
         : highestPermission;
     highestRisk =
-      highestRisk === undefined || riskRank[tool.riskLevel] > riskRank[highestRisk] ? tool.riskLevel : highestRisk;
+      highestRisk === undefined || compareRiskLevels(tool.riskLevel, highestRisk) > 0 ? tool.riskLevel : highestRisk;
   }
 
-  if (highestPermission !== undefined && permissionRank[capability.permissionLevel] < permissionRank[highestPermission]) {
+  if (
+    highestPermission !== undefined &&
+    comparePermissionLevels(capability.permissionLevel, highestPermission) < 0
+  ) {
     issues.push({
       code: "understated-permission-level",
       path: `capabilities[${capabilityIndex}].permissionLevel`,
@@ -109,7 +100,7 @@ function auditUnderlyingTools(
     });
   }
 
-  if (highestRisk !== undefined && riskRank[capability.riskLevel] < riskRank[highestRisk]) {
+  if (highestRisk !== undefined && compareRiskLevels(capability.riskLevel, highestRisk) < 0) {
     issues.push({
       code: "understated-risk-level",
       path: `capabilities[${capabilityIndex}].riskLevel`,

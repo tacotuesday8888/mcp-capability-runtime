@@ -93,3 +93,63 @@ export interface ToolSurfaceAuditReport {
   valid: boolean;
   issues: ToolSurfaceAuditIssue[];
 }
+
+export type CapabilityBlockReasonCode =
+  | "permission-exceeds-limit"
+  | "risk-exceeds-limit"
+  | "missing-context"
+  | "no-task-match"
+  | "over-limit";
+
+export interface CapabilityBlockReason {
+  code: CapabilityBlockReasonCode;
+  message: string;
+}
+
+export interface CapabilitySelectionRequest {
+  task: string;
+  context?: string[];
+  maxPermissionLevel?: PermissionLevel;
+  maxRiskLevel?: RiskLevel;
+  limit?: number;
+}
+
+export interface CapabilitySelection {
+  capabilityId: string;
+  title: string;
+  score: number;
+  permissionLevel: PermissionLevel;
+  riskLevel: RiskLevel;
+  matchedTerms: string[];
+  matchedContext: string[];
+  missingContext: string[];
+  underlyingTools: string[];
+  proofReturned: string[];
+}
+
+export interface BlockedCapabilitySelection {
+  capabilityId: string;
+  title: string;
+  score: number;
+  permissionLevel: PermissionLevel;
+  riskLevel: RiskLevel;
+  matchedTerms: string[];
+  matchedContext: string[];
+  missingContext: string[];
+  reasons: CapabilityBlockReason[];
+}
+
+export interface CapabilitySelectionReport {
+  mode: "selection";
+  task: string;
+  providedContext: string[];
+  maxPermissionLevel: PermissionLevel;
+  maxRiskLevel: RiskLevel;
+  limit: number;
+  consideredCapabilityCount: number;
+  selected: CapabilitySelection[];
+  blocked: BlockedCapabilitySelection[];
+  exposedUnderlyingTools: string[];
+  exposedToolCount: number;
+  selectedEstimatedTokens: number;
+}

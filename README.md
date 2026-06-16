@@ -14,12 +14,13 @@ Requires Node.js 22 or newer.
 npm install
 npm test
 npm run demo:tax
+npm run demo:select
 npm run example:tax
 npm run raw:tax
 npm run pack:check
 ```
 
-The demo, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real tool execution.
+The demo, selector, external JSON examples, and package dry-run are local and deterministic. They do not need SaaS accounts, API keys, real credentials, a live LLM, real MCP transports, or real tool execution.
 
 ## What The Demo Shows
 
@@ -74,6 +75,44 @@ Duplicate groups
 
 The token estimate is a documented heuristic, not a model tokenizer. It is meant to make the tool-list tax visible and repeatable.
 
+## Task-Scoped Selection
+
+The tax meter shows the before/after cost of raw tools versus capabilities. The selector shows what an agent should see for one task right now.
+
+```bash
+npm run demo:select
+```
+
+Example selector output excerpt:
+
+```text
+MCP Capability Runtime Selector
+===============================
+
+Task                     Investigate checkout 500s from the last 30 minutes
+Policy                   permission <= read, risk <= medium
+Provided context         service=checkout; timeWindow=30m; symptom=500
+
+Selected capabilities    1 of 8 (~110 prompt tokens, 5 underlying tools)
+- triage-production-incident (read/medium, score 24)
+  matched: 30, checkout, investigate, last, minutes
+  proof: event ids; trace id; release id; log query; chat permalink
+
+Blocked capabilities
+- inspect-work-items: missing required context: incident keywords, repository name
+- coordinate-status-update: write permission exceeds request ceiling read; missing required context: incident channel, current impact, next action, evidence links
+- ...
+
+Dry-run receipt
+- selected ids: triage-production-incident
+- exposed tools: chat.searchIncidentChannel, deploy.getStatus, deploy.searchLogs, error.getTrace, error.searchEvents
+- no tools were executed
+```
+
+By default, selection is conservative: permission is capped at `read`, risk is capped at `medium`, and no tools run. The receipt explains which capabilities were selected, which were blocked, what context is missing, and what proof selected capabilities should return.
+
+See [docs/capability-selector.md](docs/capability-selector.md) for selector options and JSON receipt output.
+
 ## External JSON Input
 
 You can run the tax meter against a static, read-only MCP-like tool surface with a proposed capability surface:
@@ -103,11 +142,17 @@ import {
   demoCapabilities,
   demoServers,
   renderTaxMeterReport,
+  selectCapabilities,
 } from "mcp-capability-runtime";
 
 const report = computeTaxMeter(demoServers, demoCapabilities);
+const selected = selectCapabilities(demoCapabilities, {
+  task: "Investigate checkout 500s",
+  context: ["service=checkout", "timeWindow=30m", "symptom=500"],
+});
 
 console.log(renderTaxMeterReport(report));
+console.log(selected.selected.map((capability) => capability.capabilityId));
 ```
 
 Public exports include:
@@ -116,6 +161,7 @@ Public exports include:
 - the local 10-server demo fixture
 - the cleaned capability surface
 - semantic capability surface audit
+- task-scoped capability selection
 - prompt token estimation
 - tax-meter calculation
 - text report rendering
@@ -125,7 +171,7 @@ Public exports include:
 
 This is not a rejection of MCP. The adoption path is compatibility with today's MCP ecosystem while introducing a stronger capability contract above raw tools.
 
-V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightens that path with raw-only input, package checks, and semantic capability audits. Future versions can add a real read-only MCP discovery adapter that reads tool metadata from existing MCP servers and then presents a capability surface to agents.
+V1 uses a fake MCP-like local fixture so the core idea is easy to clone, run, and inspect. V0.2 added a static JSON input path so developers can measure non-demo tool surfaces without editing source code. V0.3 tightened that path with raw-only input, package checks, and semantic capability audits. V0.4 adds task-scoped selection so a caller can expose only the capabilities that match a task, context, and permission policy. Future versions can add a real read-only MCP discovery adapter that reads tool metadata from existing MCP servers and then presents a capability surface to agents.
 
 ## V1 Scope
 
@@ -144,6 +190,7 @@ This first slice includes:
 - raw-only external JSON input
 - semantic capability surface audit
 - package dry-run check
+- task-scoped selector with dry-run receipt
 
 ## Out Of Scope For V1
 

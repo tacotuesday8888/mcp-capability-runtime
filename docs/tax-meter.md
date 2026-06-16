@@ -67,3 +67,15 @@ The audit rejects duplicate IDs, missing `underlyingTools`, empty required capab
 ## Package Check
 
 `npm run pack:check` runs `npm pack --dry-run --json`. It shows what would be included in the npm package without publishing anything.
+
+## Next Step: Selection
+
+The tax meter measures the full raw surface against the full capability surface. The selector narrows that capability surface for one task under an explicit permission and risk policy.
+
+Run:
+
+```bash
+npm run demo:select
+```
+
+See [capability-selector.md](./capability-selector.md) for the task-scoped selector and dry-run receipt.

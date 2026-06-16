@@ -49,3 +49,27 @@ In plain English: a capability can make a pile of tools easier for an agent to c
 External JSON input can omit `capabilities`. That raw-only mode is useful when someone wants to measure the current tool-list tax before designing a cleaned surface.
 
 When `capabilities` is omitted, the tax meter reports the raw surface only and skips reduction metrics. When `capabilities` is present, the same contract above is validated before comparison.
+
+## Selection Contract
+
+In v0.4, capabilities can be selected for one task without exposing the whole surface.
+
+The selector request includes:
+
+- task text
+- provided context
+- maximum permission level
+- maximum risk level
+- result limit
+
+The selector returns a dry-run receipt with:
+
+- selected capability IDs
+- blocked capability IDs and reasons
+- missing required context
+- matched task terms
+- expected proof returned
+- exposed underlying tool IDs
+- estimated prompt-token cost of the selected surface
+
+The default permission ceiling is `read`, and the default risk ceiling is `medium`. That keeps the first selector conservative: write, execute, admin, and high-risk capabilities must be explicitly allowed before they can appear in the selected surface.
